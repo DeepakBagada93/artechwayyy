@@ -1,11 +1,3 @@
-export interface Comment {
-  id: number;
-  author: string;
-  avatar: string;
-  dataAiHint: string;
-  date: string;
-  content: string;
-}
 
 export interface Post {
   slug: string;
@@ -17,7 +9,6 @@ export interface Post {
   excerpt: string;
   content: string;
   tags: string[];
-  comments: Comment[];
 }
 
 export const POSTS: Post[] = [
@@ -37,10 +28,6 @@ Beyond coding, AI is driving a new era of personalized user experiences. By anal
 
 The future points towards even deeper integration. We can expect AI to play a crucial role in automated testing, identifying and fixing bugs before they reach production. Furthermore, AI-driven design tools will be able to generate aesthetically pleasing and user-friendly layouts based on simple text descriptions, bridging the gap between idea and implementation. As we move forward, the collaboration between human developers and AI assistants will be key to building the next generation of intelligent, responsive, and highly engaging web experiences.`,
     tags: ['AI', 'Web Development', 'Future Tech'],
-    comments: [
-      { id: 1, author: 'Alex Ray', avatar: 'https://placehold.co/40x40', dataAiHint: 'man portrait', date: '2024-07-22', content: 'Fantastic read! The potential of AI in coding assistance is truly mind-boggling.' },
-      { id: 2, author: 'Mia Wong', avatar: 'https://placehold.co/40x40', dataAiHint: 'woman portrait', date: '2024-07-23', content: 'I\'m particularly excited about AI-driven personalization. It\'s the key to making the web feel more human.' },
-    ],
   },
   {
     slug: 'a-deep-dive-into-react-server-components',
@@ -58,9 +45,6 @@ One of the key advantages of Server Components is direct access to server-side d
 
 It's important to understand that RSCs are not a replacement for Client Components. Instead, they work together. A single application can be a tree of components where Server Components and Client Components are interleaved. This hybrid model allows developers to choose the best rendering environment for each part of their application, optimizing for both performance and interactivity. Mastering this new architecture will be essential for modern React developers looking to build highly performant and scalable applications.`,
     tags: ['React', 'Web Development'],
-    comments: [
-      { id: 1, author: 'Chris Lee', avatar: 'https://placehold.co/40x40', dataAiHint: 'person technology', date: '2024-07-19', content: 'This is the clearest explanation of RSCs I\'ve seen. Thank you!' },
-    ],
   },
   {
     slug: 'mastering-tailwind-css-gradients',
@@ -78,10 +62,6 @@ Once you've set the direction, you define the colors. This is done with the \`fr
 
 But Tailwind doesn't stop there. You can control the position of your color stops using utilities like \`from-10%\` or \`to-90%\`. This gives you precise control over your gradient's appearance. You can even create text gradients by combining \`bg-clip-text\` and \`text-transparent\` with your gradient utilities. This allows for stunning headline effects that are sure to catch the user's eye. By mastering these simple but powerful utilities, you can elevate your designs and create visually compelling interfaces with ease.`,
     tags: ['Tailwind CSS', 'Design'],
-    comments: [
-      { id: 1, author: 'Ben Green', avatar: 'https://placehold.co/40x40', dataAiHint: 'man design', date: '2024-07-16', content: 'The text-gradient tip is a game-changer! Awesome article.' },
-      { id: 2, author: 'Sarah Jones', avatar: 'https://placehold.co/40x40', dataAiHint: 'woman design', date: '2024-07-16', content: 'I used to struggle with gradients in CSS. Tailwind makes it so much fun.' },
-    ],
   },
   {
     slug: 'why-typescript-is-a-game-changer',
@@ -99,7 +79,6 @@ Secondly, TypeScript vastly improves the developer experience. With types, code 
 
 While there is a learning curve, the investment in adopting TypeScript pays huge dividends in the long run, especially for large-scale applications. It promotes building more robust, maintainable, and scalable software. It's not just about avoiding errors; it's about writing clearer, more predictable code and fostering better collaboration within development teams. In the modern web development landscape, TypeScript isn't just a tool; it's a game-changer.`,
     tags: ['TypeScript', 'Programming'],
-    comments: [],
   },
   {
     slug: 'getting-started-with-social-media-marketing',
@@ -111,7 +90,6 @@ While there is a learning curve, the investment in adopting TypeScript pays huge
     excerpt: 'A beginner\'s guide to leveraging social media platforms to grow your brand and engage with your audience effectively.',
     content: 'Social media marketing (SMM) has become an indispensable tool for businesses of all sizes. It\'s more than just posting updates; it\'s about creating a community, building brand identity, and driving business goals. This guide will walk you through the first steps. First, define your goals. Are you looking for brand awareness, lead generation, or direct sales? Your goals will dictate your strategy. Next, identify your target audience. Which platforms do they use? What content do they engage with? Understanding your audience is key to creating content that resonates. Then, choose your platforms. You don\'t need to be on every platform. Focus on where your audience is most active, whether it\'s Instagram, TikTok, LinkedIn, or Facebook. Finally, create a content calendar. Planning your posts in advance ensures consistency and helps you align your content with your marketing campaigns. Start small, be consistent, and don\'t be afraid to experiment to see what works best for your brand.',
     tags: ['Social Media', 'Marketing'],
-    comments: [],
   },
    {
     slug: 'seo-for-developers',
@@ -123,6 +101,5 @@ While there is a learning curve, the investment in adopting TypeScript pays huge
     excerpt: 'Learn the technical SEO principles that every web developer should know to build websites that rank higher in search results.',
     content: 'Search Engine Optimization (SEO) is often seen as a marketing function, but technical implementation is the foundation of any successful SEO strategy. As a developer, you have a critical role to play. Key areas include site speed. A faster site provides a better user experience and is favored by search engines. Use tools like Lighthouse to audit performance and optimize your images, scripts, and server response times. Mobile-friendliness is non-negotiable. With mobile-first indexing, Google primarily uses the mobile version of your site for ranking. Ensure your design is responsive and provides a seamless experience on all devices. A logical site structure and clean URLs are also crucial. They help search engines crawl your site efficiently and understand the relationship between your pages. Finally, implement structured data (like Schema.org) to help search engines understand the content of your pages and enable rich snippets in search results. By focusing on these technical aspects, you can build a strong foundation for SEO success.',
     tags: ['SEO', 'Web Development'],
-    comments: [],
   },
 ];

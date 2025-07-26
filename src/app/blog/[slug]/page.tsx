@@ -5,7 +5,6 @@ import { POSTS } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, User } from 'lucide-react';
 import { RelatedPosts } from '@/components/related-posts';
-import { Comments } from '@/components/comments';
 import { Separator } from '@/components/ui/separator';
 
 interface BlogPostPageProps {
@@ -72,16 +71,11 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
       
       <Separator className="my-12 bg-border/20" />
 
-      <div className="grid md:grid-cols-3 gap-12">
-        <div className="md:col-span-2">
-            <Comments initialComments={post.comments} />
-        </div>
-        <aside className="space-y-8 md:col-span-1">
-            <RelatedPosts 
-              currentPostSlug={post.slug}
-            />
-        </aside>
-      </div>
+      <aside className="space-y-8">
+          <RelatedPosts 
+            currentPostSlug={post.slug}
+          />
+      </aside>
     </article>
   );
 }
