@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Home, PlusSquare, Settings, Wand2, Image as ImageIcon } from 'lucide-react';
+import { Home, PlusSquare, Settings } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -43,7 +43,6 @@ import {
   SidebarMenuButton,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { generateBlogImageAction } from '@/app/actions';
 
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -51,7 +50,7 @@ const postSchema = z.object({
   author: z.string().min(1, 'Author is required'),
   category: z.string().min(1, 'Category is required'),
   tags: z.string().min(1, 'Tags are required'),
-  image: z.string().url('A valid image URL is required.'),
+  image: z.any(),
 });
 
 type PostFormValues = z.infer<typeof postSchema>;
@@ -62,11 +61,13 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const { toast } = useToast();
   const post = POSTS.find((p) => p.slug === params.slug);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-
+  
   if (!post) {
     notFound();
   }
+  
+  const [previewImage, setPreviewImage] = useState<string | null>(post.image);
+
 
   const form = useForm<PostFormValues>({
     resolver: zodResolver(postSchema),
@@ -81,51 +82,28 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
     },
   });
 
-  const { handleSubmit, control, watch, setValue, getValues } = form;
-  const title = watch('title');
-  const content = watch('content');
-  const imageUrl = watch('image');
+  const { handleSubmit, control, watch } = form;
 
-  const handleGenerateImage = async () => {
-    const { title, content } = getValues();
-    if (!title || !content) {
-      toast({
-        title: 'Title and content are required',
-        description: 'Please enter a title and content to generate an image.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    setIsGeneratingImage(true);
-    try {
-      const result = await generateBlogImageAction({ title, content });
-      if (result.imageUrl) {
-        setValue('image', result.imageUrl, { shouldValidate: true });
-        toast({
-          title: 'Image Generated',
-          description: 'The blog post image has been successfully generated.',
-        });
-      } else {
-        toast({
-          title: 'Error',
-          description: 'Failed to generate image. Please try again.',
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An unexpected error occurred while generating the image.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsGeneratingImage(false);
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      form.setValue('image', event.target.files);
+    } else {
+        // If no file is selected, keep the old image
+        setPreviewImage(post.image);
+        form.setValue('image', post.image);
     }
   };
 
 
   const onSubmit = (data: PostFormValues) => {
-    console.log('Updating post:', data);
+    const imageName = typeof data.image === 'string' ? data.image : data.image[0].name;
+    console.log('Updating post:', { ...data, image: imageName });
     // This is a simulation. In a real app, you'd call an API to update the post.
     toast({
       title: 'Post Updated!',
@@ -217,30 +195,24 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
                     )}
                   />
 
-                  <FormItem>
-                    <div className="flex justify-between items-center mb-2">
-                      <FormLabel>Image</FormLabel>
-                       <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleGenerateImage}
-                        disabled={isGeneratingImage || !title || !content}
-                      >
-                        <ImageIcon className="mr-2 h-4 w-4" />
-                        {isGeneratingImage ? 'Generating...' : 'Generate with AI'}
-                      </Button>
-                    </div>
-                     <FormControl>
-                       <Input {...form.register('image')} placeholder="Image URL will appear here" />
-                    </FormControl>
-                     {imageUrl && (
-                      <div className="mt-4 relative aspect-video w-full max-w-md overflow-hidden rounded-lg">
-                        <Image src={imageUrl} alt="Generated blog post image" fill className="object-cover" />
-                      </div>
-                    )}
-                    <FormMessage>{form.formState.errors.image?.message}</FormMessage>
-                  </FormItem>
+                    <FormField
+                        control={control}
+                        name="image"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Image</FormLabel>
+                            <FormControl>
+                                <Input type="file" accept="image/*" onChange={handleImageChange} />
+                            </FormControl>
+                            {previewImage && (
+                            <div className="mt-4 relative aspect-video w-full max-w-md overflow-hidden rounded-lg">
+                                <Image src={previewImage} alt="Image preview" fill className="object-cover" />
+                            </div>
+                            )}
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
 
                   <FormField
                     control={control}

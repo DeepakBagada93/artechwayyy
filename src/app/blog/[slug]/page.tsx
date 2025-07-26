@@ -1,3 +1,4 @@
+
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { POSTS } from '@/lib/data';
@@ -25,8 +26,6 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
   if (!post) {
     notFound();
   }
-
-  const allPosts = POSTS.map(p => ({ title: p.title, slug: p.slug }));
 
   return (
     <article className="container mx-auto max-w-4xl px-4 py-12">
@@ -79,9 +78,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
         <aside className="space-y-8 md:col-span-1">
             <RelatedPosts 
-              currentArticleContent={post.content}
               currentPostSlug={post.slug}
-              availablePosts={allPosts} 
             />
         </aside>
       </div>

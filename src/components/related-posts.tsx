@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,30 +9,22 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight } from 'lucide-react';
 
 interface RelatedPostsProps {
-  currentArticleContent: string;
   currentPostSlug: string;
-  availablePosts: { title: string; slug: string }[];
 }
 
-export function RelatedPosts({ currentArticleContent, currentPostSlug, availablePosts }: RelatedPostsProps) {
+export function RelatedPosts({ currentPostSlug }: RelatedPostsProps) {
   const [related, setRelated] = useState<{ title: string; slug: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchRelated() {
       setIsLoading(true);
-      const otherPosts = availablePosts.filter(p => p.slug !== currentPostSlug);
-      const relatedData = await getRelatedPosts({
-        currentArticleContent,
-        availablePosts: otherPosts.map(p => p.title),
-      });
-      // Ensure we only suggest posts that are not the current one and limit to 3
-      const filteredRelated = relatedData.filter(p => p.slug !== currentPostSlug).slice(0, 3);
-      setRelated(filteredRelated);
+      const relatedData = await getRelatedPosts(currentPostSlug);
+      setRelated(relatedData);
       setIsLoading(false);
     }
     fetchRelated();
-  }, [currentArticleContent, availablePosts, currentPostSlug]);
+  }, [currentPostSlug]);
 
   if (isLoading) {
     return (

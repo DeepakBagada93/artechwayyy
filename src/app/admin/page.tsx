@@ -10,8 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { generateBlogPostAction, generateBlogImageAction } from '../actions';
-import { Wand2, Home, PlusSquare, Settings, Image as ImageIcon } from 'lucide-react';
+import { Home, PlusSquare, Settings } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -49,7 +48,7 @@ const postSchema = z.object({
   author: z.string().min(1, 'Author is required'),
   category: z.string().min(1, 'Category is required'),
   tags: z.string().min(1, 'Tags are required'),
-  image: z.string().url('A valid image URL is required.'),
+  image: z.any().refine(files => files?.length === 1, 'Image is required.'),
 });
 
 type PostFormValues = z.infer<typeof postSchema>;
@@ -58,8 +57,7 @@ const categories = ['Web Development', 'AI', 'Social Media', 'Design', 'SEO'];
 
 export default function AdminPage() {
   const { toast } = useToast();
-  const [isGeneratingContent, setIsGeneratingContent] = useState(false);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const form = useForm<PostFormValues>({
     resolver: zodResolver(postSchema),
@@ -69,96 +67,38 @@ export default function AdminPage() {
       author: 'Deepak Bagada',
       category: '',
       tags: '',
-      image: '',
+      image: undefined,
     },
   });
 
-  const { handleSubmit, control, watch, setValue, getValues } = form;
-  const title = watch('title');
-  const content = watch('content');
-  const imageUrl = watch('image');
+  const { handleSubmit, control, watch } = form;
+  const imageFile = watch('image');
 
-  const handleGenerateContent = async () => {
-    if (!title) {
-      toast({
-        title: 'Title is required',
-        description: 'Please enter a title to generate content.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    setIsGeneratingContent(true);
-    try {
-      const result = await generateBlogPostAction({ title });
-      if (result.content) {
-        setValue('content', result.content, { shouldValidate: true });
-        toast({
-          title: 'Content Generated',
-          description: 'The blog post content has been successfully generated.',
-        });
-      } else {
-        toast({
-          title: 'Error',
-          description: 'Failed to generate content. Please try again.',
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An unexpected error occurred while generating content.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsGeneratingContent(false);
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      form.setValue('image', event.target.files);
+    } else {
+        setPreviewImage(null);
+        form.setValue('image', null);
     }
   };
 
-  const handleGenerateImage = async () => {
-    const { title, content } = getValues();
-    if (!title || !content) {
-      toast({
-        title: 'Title and content are required',
-        description: 'Please enter a title and content to generate an image.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    setIsGeneratingImage(true);
-    try {
-      const result = await generateBlogImageAction({ title, content });
-      if (result.imageUrl) {
-        setValue('image', result.imageUrl, { shouldValidate: true });
-        toast({
-          title: 'Image Generated',
-          description: 'The blog post image has been successfully generated.',
-        });
-      } else {
-        toast({
-          title: 'Error',
-          description: 'Failed to generate image. Please try again.',
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An unexpected error occurred while generating the image.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsGeneratingImage(false);
-    }
-  };
 
   const onSubmit = (data: PostFormValues) => {
-    console.log('Creating post:', data);
+    console.log('Creating post:', { ...data, image: data.image[0].name });
     // Here you would typically send the data to your backend to save the post
     toast({
       title: 'Post Created!',
       description: 'The new blog post has been successfully created (simulation).',
     });
     form.reset();
+    setPreviewImage(null);
   };
 
   return (
@@ -226,57 +166,43 @@ export default function AdminPage() {
                     )}
                   />
 
-                  <FormItem>
-                    <div className="flex justify-between items-center mb-2">
-                      <FormLabel>Content</FormLabel>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleGenerateContent}
-                        disabled={isGeneratingContent || !title}
-                      >
-                        <Wand2 className="mr-2 h-4 w-4" />
-                        {isGeneratingContent ? 'Generating...' : 'Generate with AI'}
-                      </Button>
-                    </div>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Write your blog post here, or generate it with AI."
-                        {...form.register('content')}
-                        rows={15}
-                        className="bg-background/50"
-                      />
-                    </FormControl>
-                    <FormMessage>
-                      {form.formState.errors.content?.message}
-                    </FormMessage>
-                  </FormItem>
-
-                   <FormItem>
-                    <div className="flex justify-between items-center mb-2">
-                      <FormLabel>Image</FormLabel>
-                       <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleGenerateImage}
-                        disabled={isGeneratingImage || !title || !content}
-                      >
-                        <ImageIcon className="mr-2 h-4 w-4" />
-                        {isGeneratingImage ? 'Generating...' : 'Generate with AI'}
-                      </Button>
-                    </div>
-                     <FormControl>
-                       <Input {...form.register('image')} placeholder="Image URL will appear here" />
-                    </FormControl>
-                     {imageUrl && (
-                      <div className="mt-4 relative aspect-video w-full max-w-md overflow-hidden rounded-lg">
-                        <Image src={imageUrl} alt="Generated blog post image" fill className="object-cover" />
-                      </div>
+                  <FormField
+                    control={control}
+                    name="content"
+                    render={({ field }) => (
+                       <FormItem>
+                        <FormLabel>Content</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Write your blog post here..."
+                            {...field}
+                            rows={15}
+                            className="bg-background/50"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                    <FormMessage>{form.formState.errors.image?.message}</FormMessage>
-                  </FormItem>
+                  />
+
+                  <FormField
+                    control={control}
+                    name="image"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Image</FormLabel>
+                        <FormControl>
+                            <Input type="file" accept="image/*" onChange={handleImageChange} />
+                        </FormControl>
+                        {previewImage && (
+                        <div className="mt-4 relative aspect-video w-full max-w-md overflow-hidden rounded-lg">
+                            <Image src={previewImage} alt="Image preview" fill className="object-cover" />
+                        </div>
+                        )}
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                   />
 
 
                    <FormField
