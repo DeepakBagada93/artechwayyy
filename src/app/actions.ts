@@ -1,6 +1,7 @@
 'use server';
 
 import { suggestRelatedPosts, type SuggestRelatedPostsInput } from '@/ai/flows/suggest-related-posts';
+import { generateBlogPost, type GenerateBlogPostInput, type GenerateBlogPostOutput } from '@/ai/flows/generate-blog-post';
 import { POSTS } from '@/lib/data';
 
 export async function getRelatedPosts(input: SuggestRelatedPostsInput): Promise<{ title: string; slug: string }[]> {
@@ -14,5 +15,15 @@ export async function getRelatedPosts(input: SuggestRelatedPostsInput): Promise<
     console.error('Error fetching related posts:', error);
     // In case of an AI error, return an empty array to prevent crashing the page.
     return [];
+  }
+}
+
+export async function generateBlogPostAction(input: GenerateBlogPostInput): Promise<GenerateBlogPostOutput> {
+  try {
+    return await generateBlogPost(input);
+  } catch (error) {
+    console.error('Error generating blog post:', error);
+    // In case of an AI error, return an empty content to prevent crashing the page.
+    return { content: '' };
   }
 }
