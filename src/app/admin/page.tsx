@@ -10,9 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { generateBlogPostAction } from '../actions';
-import { Wand2, Newspaper, Home, PlusSquare, Settings } from 'lucide-react';
+import { generateBlogPostAction, generateBlogImageAction } from '../actions';
+import { Wand2, Home, PlusSquare, Settings, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Form,
   FormControl,
@@ -48,6 +49,7 @@ const postSchema = z.object({
   author: z.string().min(1, 'Author is required'),
   category: z.string().min(1, 'Category is required'),
   tags: z.string().min(1, 'Tags are required'),
+  image: z.string().url('A valid image URL is required.'),
 });
 
 type PostFormValues = z.infer<typeof postSchema>;
@@ -56,7 +58,8 @@ const categories = ['Web Development', 'AI', 'Social Media', 'Design', 'SEO'];
 
 export default function AdminPage() {
   const { toast } = useToast();
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingContent, setIsGeneratingContent] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const form = useForm<PostFormValues>({
     resolver: zodResolver(postSchema),
@@ -66,11 +69,14 @@ export default function AdminPage() {
       author: 'Deepak Bagada',
       category: '',
       tags: '',
+      image: '',
     },
   });
 
-  const { handleSubmit, control, watch, setValue } = form;
+  const { handleSubmit, control, watch, setValue, getValues } = form;
   const title = watch('title');
+  const content = watch('content');
+  const imageUrl = watch('image');
 
   const handleGenerateContent = async () => {
     if (!title) {
@@ -81,7 +87,7 @@ export default function AdminPage() {
       });
       return;
     }
-    setIsGenerating(true);
+    setIsGeneratingContent(true);
     try {
       const result = await generateBlogPostAction({ title });
       if (result.content) {
@@ -104,7 +110,44 @@ export default function AdminPage() {
         variant: 'destructive',
       });
     } finally {
-      setIsGenerating(false);
+      setIsGeneratingContent(false);
+    }
+  };
+
+  const handleGenerateImage = async () => {
+    const { title, content } = getValues();
+    if (!title || !content) {
+      toast({
+        title: 'Title and content are required',
+        description: 'Please enter a title and content to generate an image.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsGeneratingImage(true);
+    try {
+      const result = await generateBlogImageAction({ title, content });
+      if (result.imageUrl) {
+        setValue('image', result.imageUrl, { shouldValidate: true });
+        toast({
+          title: 'Image Generated',
+          description: 'The blog post image has been successfully generated.',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to generate image. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred while generating the image.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsGeneratingImage(false);
     }
   };
 
@@ -191,10 +234,10 @@ export default function AdminPage() {
                         variant="ghost"
                         size="sm"
                         onClick={handleGenerateContent}
-                        disabled={isGenerating || !title}
+                        disabled={isGeneratingContent || !title}
                       >
                         <Wand2 className="mr-2 h-4 w-4" />
-                        {isGenerating ? 'Generating...' : 'Generate with AI'}
+                        {isGeneratingContent ? 'Generating...' : 'Generate with AI'}
                       </Button>
                     </div>
                     <FormControl>
@@ -209,6 +252,32 @@ export default function AdminPage() {
                       {form.formState.errors.content?.message}
                     </FormMessage>
                   </FormItem>
+
+                   <FormItem>
+                    <div className="flex justify-between items-center mb-2">
+                      <FormLabel>Image</FormLabel>
+                       <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleGenerateImage}
+                        disabled={isGeneratingImage || !title || !content}
+                      >
+                        <ImageIcon className="mr-2 h-4 w-4" />
+                        {isGeneratingImage ? 'Generating...' : 'Generate with AI'}
+                      </Button>
+                    </div>
+                     <FormControl>
+                       <Input {...form.register('image')} placeholder="Image URL will appear here" />
+                    </FormControl>
+                     {imageUrl && (
+                      <div className="mt-4 relative aspect-video w-full max-w-md overflow-hidden rounded-lg">
+                        <Image src={imageUrl} alt="Generated blog post image" fill className="object-cover" />
+                      </div>
+                    )}
+                    <FormMessage>{form.formState.errors.image?.message}</FormMessage>
+                  </FormItem>
+
 
                    <FormField
                     control={control}

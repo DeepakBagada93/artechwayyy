@@ -2,6 +2,7 @@
 
 import { suggestRelatedPosts, type SuggestRelatedPostsInput } from '@/ai/flows/suggest-related-posts';
 import { generateBlogPost, type GenerateBlogPostInput, type GenerateBlogPostOutput } from '@/ai/flows/generate-blog-post';
+import { generateBlogImage, type GenerateBlogImageInput, type GenerateBlogImageOutput } from '@/ai/flows/generate-blog-image';
 import { POSTS } from '@/lib/data';
 
 export async function getRelatedPosts(input: SuggestRelatedPostsInput): Promise<{ title: string; slug: string }[]> {
@@ -26,4 +27,13 @@ export async function generateBlogPostAction(input: GenerateBlogPostInput): Prom
     // In case of an AI error, return an empty content to prevent crashing the page.
     return { content: '' };
   }
+}
+
+export async function generateBlogImageAction(input: GenerateBlogImageInput): Promise<GenerateBlogImageOutput> {
+    try {
+        return await generateBlogImage(input);
+    } catch (error) {
+        console.error('Error generating blog image:', error);
+        return { imageUrl: '' };
+    }
 }
