@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { generateBlogPostAction } from '../actions';
-import { Wand2, Newspaper, Home, PlusSquare } from 'lucide-react';
+import { Wand2, Newspaper, Home, PlusSquare, Settings } from 'lucide-react';
 import Link from 'next/link';
 import {
   Form,
@@ -134,6 +134,15 @@ export default function AdminPage() {
                         </Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
+                 <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                        <Link href="/admin/manage">
+                            <Settings />
+                            <span>Manage Posts</span>
+                        </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarSeparator />
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                         <Link href="/">
@@ -150,7 +159,7 @@ export default function AdminPage() {
             <div className="flex items-center mb-8">
                 <SidebarTrigger />
                  <h1 className="font-headline text-4xl font-bold tracking-tighter text-white ml-4">
-                    Admin Dashboard
+                    Create New Post
                 </h1>
             </div>
           <Card>

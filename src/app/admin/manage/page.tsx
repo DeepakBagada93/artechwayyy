@@ -1,0 +1,170 @@
+
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { POSTS, Post } from '@/lib/data';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
+import { Home, PlusSquare, Settings, Trash2, FilePenLine } from 'lucide-react';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarSeparator,
+} from '@/components/ui/sidebar';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+export default function ManagePostsPage() {
+  const [posts, setPosts] = useState<Post[]>(POSTS);
+  const [postToDelete, setPostToDelete] = useState<Post | null>(null);
+  const { toast } = useToast();
+
+  const handleDelete = () => {
+    if (!postToDelete) return;
+    // This is a simulation. In a real app, you'd call an API to delete the post.
+    setPosts(posts.filter((p) => p.slug !== postToDelete.slug));
+    toast({
+      title: 'Post Deleted',
+      description: `The post "${postToDelete.title}" has been deleted.`,
+    });
+    setPostToDelete(null);
+  };
+
+  return (
+    <SidebarProvider>
+      <Sidebar>
+        <SidebarHeader>
+          <h2 className="text-xl font-bold px-2">Dashboard</h2>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/admin">
+                  <PlusSquare />
+                  <span>Create Post</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/admin/manage">
+                  <Settings />
+                  <span>Manage Posts</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarSeparator />
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/">
+                  <Home />
+                  <span>View Blog</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarContent>
+      </Sidebar>
+      <SidebarInset>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center mb-8">
+            <SidebarTrigger />
+            <h1 className="font-headline text-4xl font-bold tracking-tighter text-white ml-4">
+              Manage Posts
+            </h1>
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>All Blog Posts</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Author</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {posts.map((post) => (
+                    <TableRow key={post.slug}>
+                      <TableCell className="font-medium">{post.title}</TableCell>
+                      <TableCell>{post.author}</TableCell>
+                      <TableCell>{new Date(post.date).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right">
+                        <Button asChild variant="ghost" size="icon">
+                          <Link href={`/admin/edit/${post.slug}`}>
+                            <FilePenLine className="h-4 w-4" />
+                            <span className="sr-only">Edit</span>
+                          </Link>
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setPostToDelete(post)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently
+                                delete the post titled &quot;{post.title}&quot;.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel onClick={() => setPostToDelete(null)}>
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction onClick={handleDelete}>
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
