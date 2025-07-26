@@ -1,14 +1,26 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
-import { Rss } from 'lucide-react';
+import { Menu, Rss, X } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
 export function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const navLinks = [
     { name: 'Web Development', href: '/?tag=Web+Development' },
     { name: 'AI', href: '/?tag=AI' },
     { name: 'Social Media', href: '/?tag=Social+Media' },
     { name: 'Design', href: '/?tag=Design' },
-    { name: 'SEO', href: '/?tag=SEO' }
+    { name: 'SEO', href: '/?tag=SEO' },
   ];
 
   return (
@@ -31,6 +43,40 @@ export function Header() {
             </Link>
           ))}
         </nav>
+        <div className="md:hidden">
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetHeader className="p-4 border-b">
+                 <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Rss className="h-8 w-8 text-primary" />
+                    <span className="font-headline text-2xl font-bold tracking-tight text-white">
+                        Artechway
+                    </span>
+                 </Link>
+              </SheetHeader>
+              <div className="p-4">
+                <nav className="flex flex-col gap-4">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.name}
+                      href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-lg font-medium text-foreground transition-colors hover:text-primary"
+                    >
+                      {link.name}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
       <Separator className="bg-border/20" />
     </header>
