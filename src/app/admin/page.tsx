@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -10,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { generateBlogPostAction } from '../actions';
-import { Wand2, Newspaper } from 'lucide-react';
+import { Wand2, Newspaper, Home, PlusSquare } from 'lucide-react';
 import Link from 'next/link';
 import {
   Form,
@@ -38,8 +39,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { POSTS } from '@/lib/data';
 
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -121,20 +122,26 @@ export default function AdminPage() {
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-           <h2 className="text-xl font-bold">Existing Posts</h2>
+           <h2 className="text-xl font-bold px-2">Dashboard</h2>
         </SidebarHeader>
         <SidebarContent>
             <SidebarMenu>
-                {POSTS.map(post => (
-                    <SidebarMenuItem key={post.slug}>
-                        <SidebarMenuButton asChild>
-                            <Link href={`/blog/${post.slug}`} target="_blank">
-                                <Newspaper />
-                                <span>{post.title}</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))}
+                <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                        <Link href="/admin">
+                            <PlusSquare />
+                            <span>Create Post</span>
+                        </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                        <Link href="/">
+                            <Home />
+                            <span>View Blog</span>
+                        </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
             </SidebarMenu>
         </SidebarContent>
       </Sidebar>
