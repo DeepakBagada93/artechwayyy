@@ -37,7 +37,7 @@ const prompt = ai.definePrompt({
   Write a blog post with the following title:
   "{{title}}"
   
-  Please provide only the content of the blog post.`,
+  Your output must be the generated content for the blog post inside of a JSON object with a "content" key.`,
 });
 
 const generateBlogPostFlow = ai.defineFlow(
