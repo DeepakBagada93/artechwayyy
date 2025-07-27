@@ -67,7 +67,7 @@ interface AdminUser {
     name: string;
 }
 
-export default function EditPostPage({ params }: { params: { slug: string } }) {
+export default function EditPostPage({ params: {slug} }: { params: { slug: string } }) {
   const router = useRouter();
   const { toast } = useToast();
   const [post, setPost] = useState<Post | null>(null);
@@ -106,7 +106,7 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .eq('slug', params.slug)
+        .eq('slug', slug)
         .single();
       
       if (error || !data) {
@@ -128,7 +128,7 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
       setIsLoading(false);
     };
     fetchPost();
-  }, [params.slug, form]);
+  }, [slug, form]);
   
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
