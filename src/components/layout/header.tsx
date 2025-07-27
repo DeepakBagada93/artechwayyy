@@ -23,17 +23,20 @@ export function Header() {
   useEffect(() => {
     async function fetchCategories() {
         if (!supabase) return;
-        const { data, error } = await supabase.from('posts').select('category');
+        
+        // Using a view or RPC is better for distinct values
+        const { data, error } = await supabase
+            .rpc('get_distinct_categories');
+
         if (error) {
             console.error("Error fetching categories:", error);
             return;
         }
 
-        const allCategories = data.map(post => post.category);
-        const uniqueCategories = [...new Set(allCategories)].filter(Boolean); // Filter out null/undefined
+        const uniqueCategories = data.map((item: { category: string }) => item.category).filter(Boolean);
         const sortedCategories = uniqueCategories.sort();
         
-        const links = sortedCategories.map(category => ({
+        const links = sortedCategories.map((category: string) => ({
             name: category,
             href: `/category/${generateSlug(category)}`
         }));
