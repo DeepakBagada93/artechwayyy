@@ -25,6 +25,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Rss } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -36,6 +37,13 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // On component mount, clear any existing login status
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('isLoggedIn');
+    }
+  }, []);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -49,6 +57,10 @@ export default function LoginPage() {
     // This is a simulation. In a real app, you'd verify credentials.
     console.log('Login attempt:', data);
     if (data.email === 'admin@example.com' && data.password === 'password') {
+      // Set a flag in localStorage to simulate being logged in
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('isLoggedIn', 'true');
+      }
       toast({
         title: 'Login Successful!',
         description: 'Redirecting to the admin dashboard...',
