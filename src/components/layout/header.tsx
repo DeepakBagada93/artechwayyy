@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import {
@@ -59,8 +59,8 @@ export function Header() {
           <Image
             src="/artechway.png"
             alt="Artechway Logo"
-            width={150}
-            height={30}
+            width={100}
+            height={20}
             priority
             data-ai-hint="logo tech"
           />
@@ -90,8 +90,8 @@ export function Header() {
                     <Image
                         src="/artechway.png"
                         alt="Artechway Logo"
-                        width={150}
-                        height={30}
+                        width={100}
+                        height={20}
                         priority
                         data-ai-hint="logo tech"
                     />
