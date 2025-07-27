@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, Rss, X } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
@@ -12,18 +12,36 @@ import {
   SheetHeader,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { supabase } from '@/lib/supabaseClient';
 
 const generateSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [navLinks, setNavLinks] = useState<{name: string, href: string}[]>([]);
 
-  const navLinks = [
-    { name: 'Web Development', href: `/category/${generateSlug('Web Development')}` },
-    { name: 'AI', href: `/category/${generateSlug('AI')}` },
-    { name: 'Social Media Marketing', href: `/category/${generateSlug('Social Media Marketing')}` },
-    { name: 'Latest Trends', href: `/category/${generateSlug('Latest Trends')}` },
-  ];
+  useEffect(() => {
+    async function fetchTags() {
+        if (!supabase) return;
+        const { data, error } = await supabase.from('posts').select('tags');
+        if (error) {
+            console.error("Error fetching tags:", error);
+            return;
+        }
+
+        const allTags = data.flatMap(post => post.tags);
+        const uniqueTags = [...new Set(allTags)];
+        const sortedTags = uniqueTags.sort();
+        
+        const links = sortedTags.map(tag => ({
+            name: tag,
+            href: `/tag/${generateSlug(tag)}`
+        }));
+        setNavLinks(links);
+    }
+    fetchTags();
+  }, [])
+
 
   return (
     <header className="px-4 md:px-6 sticky top-0 z-50 bg-background/80 backdrop-blur-sm">

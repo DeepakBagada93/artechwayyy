@@ -2,56 +2,61 @@
 import { Post } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
-import { notFound } from 'next/navigation';
 
-interface CategoryPageProps {
+interface TagPageProps {
   params: {
     slug: string;
   };
 }
 
-const getCategoryNameFromSlug = (slug: string) => {
-    return slug
+const getTagNameFromSlug = (slug: string) => {
+    if (!slug) return '';
+    // Handle multi-word tags like "social-media-marketing"
+    if (slug.includes('-')) {
+         return slug
         .split('-')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
+    }
+    // Handle single word tags like "ai"
+    return slug.toUpperCase();
 }
 
 
-async function getPostsByCategory(slug: string): Promise<{ posts: Post[], categoryName: string }> {
-  if (!supabase) return { posts: [], categoryName: '' };
+async function getPostsByTag(slug: string): Promise<{ posts: Post[], tagName: string }> {
+  if (!supabase) return { posts: [], tagName: '' };
   
-  const categoryName = getCategoryNameFromSlug(slug);
+  const tagName = getTagNameFromSlug(slug);
 
   const { data, error } = await supabase
     .from('posts')
     .select('*')
-    .filter('tags', 'cs', `{${categoryName}}`)
+    .filter('tags', 'cs', `{${tagName}}`)
     .order('date', { ascending: false });
 
   if (error) {
-    console.error(`Error fetching posts for category "${categoryName}":`, error);
-    return { posts: [], categoryName };
+    console.error(`Error fetching posts for tag "${tagName}":`, error);
+    return { posts: [], tagName };
   }
 
-  return { posts: (data || []) as Post[], categoryName };
+  return { posts: (data || []) as Post[], tagName };
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
-  const { posts, categoryName } = await getPostsByCategory(params.slug);
+export default async function TagPage({ params }: TagPageProps) {
+  const { posts, tagName } = await getPostsByTag(params.slug);
 
   if (!posts || posts.length === 0) {
     return (
         <div className="container mx-auto px-4 py-8">
             <section className="my-12 md:my-16">
                 <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-white text-center">
-                {categoryName}
+                {tagName}
                 </h1>
             </section>
             <section className="text-center py-16">
                 <h2 className="text-2xl font-headline">No posts yet</h2>
                 <p className="text-muted-foreground mt-2">
-                    There are currently no blog posts in the {categoryName} category. Please check back later.
+                    There are currently no blog posts with the tag &quot;{tagName}&quot;. Please check back later.
                 </p>
             </section>
       </div>
@@ -62,10 +67,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     <div className="container mx-auto px-4 py-8">
       <section className="my-12 md:my-16">
         <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-white text-center">
-          {categoryName}
+          {tagName}
         </h1>
         <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto text-center">
-          Articles and insights on {categoryName}.
+          Articles and insights on {tagName}.
         </p>
       </section>
 
@@ -77,4 +82,3 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     </div>
   );
 }
-
