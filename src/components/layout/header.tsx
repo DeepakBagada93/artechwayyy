@@ -24,16 +24,14 @@ export function Header() {
     async function fetchCategories() {
         if (!supabase) return;
         
-        // Using a view or RPC is better for distinct values
-        const { data, error } = await supabase
-            .rpc('get_distinct_categories');
+        const { data, error } = await supabase.from('posts').select('category');
 
         if (error) {
             console.error("Error fetching categories:", error);
             return;
         }
 
-        const uniqueCategories = data.map((item: { category: string }) => item.category).filter(Boolean);
+        const uniqueCategories = [...new Set(data.map(item => item.category).filter(Boolean))];
         const sortedCategories = uniqueCategories.sort();
         
         const links = sortedCategories.map((category: string) => ({
