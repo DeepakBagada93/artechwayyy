@@ -61,12 +61,28 @@ type PostFormValues = z.infer<typeof postSchema>;
 
 const categories = ['Web Development', 'AI', 'Social Media Marketing', 'Latest Trends'];
 
+interface AdminUser {
+    id: string;
+    email: string;
+    name: string;
+}
+
 export default function EditPostPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const { toast } = useToast();
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            setCurrentUser(JSON.parse(userStr));
+        }
+    }
+  }, []);
 
   const form = useForm<PostFormValues>({
     resolver: zodResolver(postSchema),
@@ -184,6 +200,7 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
         localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('user');
     }
     router.push('/login');
   }
@@ -249,8 +266,8 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
                     <AvatarFallback><User /></AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col text-sm">
-                    <span className="font-semibold">Admin</span>
-                    <span className="text-muted-foreground">admin@example.com</span>
+                    <span className="font-semibold">{currentUser?.name ?? 'Admin'}</span>
+                    <span className="text-muted-foreground">{currentUser?.email ?? 'admin@example.com'}</span>
                 </div>
                 <Button variant="ghost" size="icon" className="ml-auto" onClick={handleLogout}>
                     <LogOut />

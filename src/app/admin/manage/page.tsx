@@ -44,12 +44,27 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
+interface AdminUser {
+    id: string;
+    email: string;
+    name: string;
+}
 
 export default function ManagePostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [postToDelete, setPostToDelete] = useState<Post | null>(null);
   const { toast } = useToast();
   const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            setCurrentUser(JSON.parse(userStr));
+        }
+    }
+  }, []);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -91,6 +106,7 @@ export default function ManagePostsPage() {
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
         localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('user');
     }
     router.push('/login');
   }
@@ -136,8 +152,8 @@ export default function ManagePostsPage() {
                     <AvatarFallback><User /></AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col text-sm">
-                    <span className="font-semibold">Admin</span>
-                    <span className="text-muted-foreground">admin@example.com</span>
+                    <span className="font-semibold">{currentUser?.name ?? 'Admin'}</span>
+                    <span className="text-muted-foreground">{currentUser?.email ?? 'admin@example.com'}</span>
                 </div>
                 <Button variant="ghost" size="icon" className="ml-auto" onClick={handleLogout}>
                     <LogOut />

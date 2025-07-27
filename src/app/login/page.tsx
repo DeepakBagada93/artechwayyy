@@ -42,7 +42,8 @@ export default function LoginPage() {
   useEffect(() => {
     // On component mount, clear any existing login status
     if (typeof window !== 'undefined') {
-        localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('user');
     }
   }, []);
 
@@ -82,6 +83,7 @@ export default function LoginPage() {
         // Set a flag in localStorage to simulate being logged in
         if (typeof window !== 'undefined') {
             localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('user', JSON.stringify(user));
         }
         toast({
             title: 'Login Successful!',

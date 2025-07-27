@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -64,22 +64,44 @@ function generateSlug(title: string) {
     return title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 }
 
+interface AdminUser {
+    id: string;
+    email: string;
+    name: string;
+}
+
 export default function AdminPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            setCurrentUser(JSON.parse(userStr));
+        }
+    }
+  }, []);
 
   const form = useForm<PostFormValues>({
     resolver: zodResolver(postSchema),
     defaultValues: {
       title: '',
       content: '',
-      author: 'Deepak Bagada',
+      author: '',
       category: '',
       tags: '',
       image: undefined,
     },
   });
+
+  useEffect(() => {
+    if (currentUser) {
+        form.setValue('author', currentUser.name);
+    }
+  }, [currentUser, form]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -153,6 +175,7 @@ export default function AdminPage() {
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
         localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('user');
     }
     router.push('/login');
   }
@@ -198,8 +221,8 @@ export default function AdminPage() {
                     <AvatarFallback><User /></AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col text-sm">
-                    <span className="font-semibold">Admin</span>
-                    <span className="text-muted-foreground">admin@example.com</span>
+                    <span className="font-semibold">{currentUser?.name ?? 'Admin'}</span>
+                    <span className="text-muted-foreground">{currentUser?.email ?? 'admin@example.com'}</span>
                 </div>
                 <Button variant="ghost" size="icon" className="ml-auto" onClick={handleLogout}>
                     <LogOut />
