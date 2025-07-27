@@ -34,7 +34,7 @@ export function Header() {
         return;
       }
       
-      const categories = data.map(item => item.category);
+      const categories = data.map((item: any) => item.category);
       processCategories(categories);
     }
 
