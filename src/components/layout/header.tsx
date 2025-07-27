@@ -13,14 +13,16 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 
+const generateSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
+
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { name: 'Web Development', href: '/?tag=Web+Development' },
-    { name: 'AI', href: '/?tag=AI' },
-    { name: 'Social Media Marketing', href: '/?tag=Social+Media+Marketing' },
-    { name: 'Latest Trends', href: '/?tag=Latest+Trends' },
+    { name: 'Web Development', href: `/category/${generateSlug('Web Development')}` },
+    { name: 'AI', href: `/category/${generateSlug('AI')}` },
+    { name: 'Social Media Marketing', href: `/category/${generateSlug('Social Media Marketing')}` },
+    { name: 'Latest Trends', href: `/category/${generateSlug('Latest Trends')}` },
   ];
 
   return (
