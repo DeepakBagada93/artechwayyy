@@ -23,6 +23,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchPosts = async () => {
+      if (!supabase) return;
       const { data, error } = await supabase.from('posts').select('*').order('date', { ascending: false });
       if (error) {
         console.error('Error fetching posts:', error);

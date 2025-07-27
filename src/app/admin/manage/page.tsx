@@ -53,6 +53,7 @@ export default function ManagePostsPage() {
 
   useEffect(() => {
     const fetchPosts = async () => {
+        if (!supabase) return;
         const { data, error } = await supabase.from('posts').select('*').order('date', { ascending: false });
         if (error) {
             console.error('Error fetching posts:', error);
@@ -66,7 +67,7 @@ export default function ManagePostsPage() {
 
 
   const handleDelete = async () => {
-    if (!postToDelete) return;
+    if (!postToDelete || !supabase) return;
     
     const { error } = await supabase.from('posts').delete().eq('id', postToDelete.id);
 

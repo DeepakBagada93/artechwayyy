@@ -55,6 +55,15 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
+    if (!supabase) {
+        toast({
+            variant: 'destructive',
+            title: 'Login Failed',
+            description: 'Supabase client is not available. Please check your configuration.',
+        });
+        return;
+    }
+
     const { data: user, error } = await supabase
         .from('admin_users')
         .select('*')

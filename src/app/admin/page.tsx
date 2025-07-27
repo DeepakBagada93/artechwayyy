@@ -98,6 +98,11 @@ export default function AdminPage() {
 
 
   const onSubmit = async (data: PostFormValues) => {
+    if (!supabase) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Supabase client is not initialized.' });
+        return;
+    }
+
     const imageFile = data.image[0] as File;
     const slug = generateSlug(data.title);
     const imagePath = `${slug}-${imageFile.name}`;

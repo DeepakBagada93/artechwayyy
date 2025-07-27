@@ -15,6 +15,7 @@ interface BlogPostPageProps {
 }
 
 export async function generateStaticParams() {
+  if (!supabase) return [];
   const { data: posts } = await supabase.from('posts').select('slug');
   return posts?.map((post) => ({
     slug: post.slug,
@@ -22,6 +23,7 @@ export async function generateStaticParams() {
 }
 
 async function getPost(slug: string): Promise<Post | null> {
+    if (!supabase) return null;
   const { data, error } = await supabase
     .from('posts')
     .select('*')

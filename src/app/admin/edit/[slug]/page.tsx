@@ -82,6 +82,10 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     const fetchPost = async () => {
+      if (!supabase) {
+        setIsLoading(false);
+        return;
+      };
       setIsLoading(true);
       const { data, error } = await supabase
         .from('posts')
@@ -126,7 +130,7 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
   };
 
   const onSubmit = async (data: PostFormValues) => {
-    if (!post) return;
+    if (!post || !supabase) return;
 
     let imageUrl = post.image;
     // Check if a new image file was uploaded

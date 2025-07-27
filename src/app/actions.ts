@@ -4,6 +4,7 @@
 import { supabase } from '@/lib/supabaseClient';
 
 export async function getRelatedPosts(currentPostSlug: string): Promise<{ title: string; slug: string }[]> {
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from('posts')
     .select('title, slug')
