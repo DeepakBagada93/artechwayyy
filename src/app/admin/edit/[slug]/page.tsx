@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter, notFound } from 'next/navigation';
+import { useRouter, notFound, useParams } from 'next/navigation';
 import { Post } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,8 +67,10 @@ interface AdminUser {
     name: string;
 }
 
-export default function EditPostPage({ params: {slug} }: { params: { slug: string } }) {
+export default function EditPostPage() {
   const router = useRouter();
+  const params = useParams();
+  const slug = params.slug as string;
   const { toast } = useToast();
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,7 +100,7 @@ export default function EditPostPage({ params: {slug} }: { params: { slug: strin
 
   useEffect(() => {
     const fetchPost = async () => {
-      if (!supabase) {
+      if (!supabase || !slug) {
         setIsLoading(false);
         return;
       };
