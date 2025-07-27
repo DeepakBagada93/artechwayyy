@@ -1,57 +1,59 @@
--- Create the posts table
+-- Create the table for blog posts
 CREATE TABLE posts (
-  id SERIAL PRIMARY KEY,
-  slug TEXT UNIQUE NOT-NULL,
-  title TEXT NOT-NULL,
-  author TEXT NOT-NULL,
-  date TIMESTAMPTZ DEFAULT NOW(),
+  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  slug TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL,
+  author TEXT NOT NULL,
+  date TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
   image TEXT,
-  data_ai_hint TEXT,
+  dataAiHint TEXT,
   excerpt TEXT,
   content TEXT,
   tags TEXT[]
 );
 
--- Create the admin_users table
+-- Create the table for admin users
 CREATE TABLE admin_users (
-  id SERIAL PRIMARY KEY,
-  email TEXT UNIQUE NOT-NULL,
-  password TEXT NOT-NULL,
-  name TEXT
+  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL
 );
 
 -- Insert the initial admin user
-INSERT INTO admin_users (email, password, name) VALUES ('admin@example.com', 'password', 'Deepak');
+INSERT INTO admin_users (email, password)
+VALUES ('Deepak', 'bagada1993');
 
--- Insert initial blog posts
-INSERT INTO posts (slug, title, author, date, image, data_ai_hint, excerpt, content, tags) VALUES 
-('the-future-of-ai-in-web-development', 'The Future of AI in Web Development', 'Jane Doe', '2024-07-21', 'https://placehold.co/1200x600', 'artificial intelligence code', 'Explore how Artificial Intelligence is revolutionizing the landscape of web development, from automated coding to personalized user experiences.', 'The integration of Artificial Intelligence (AI) into web development is not just a futuristic concept; it''s a present-day reality that is reshaping how developers create, deploy, and maintain web applications. AI-powered tools are automating repetitive tasks, enabling more sophisticated personalization, and even assisting in the creative process of design and content generation.
+-- Enable Row Level Security for the posts table
+ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 
-One of the most significant impacts of AI is in the realm of code generation. Tools like GitHub Copilot and Tabnine use machine learning models trained on vast amounts of code to suggest lines or entire functions as developers type. This not only accelerates the development process but also helps in reducing human error and ensuring adherence to best practices.
+-- Create a policy that allows public read access to all posts
+CREATE POLICY "Allow public read access" ON posts
+FOR SELECT USING (true);
 
-Beyond coding, AI is driving a new era of personalized user experiences. By analyzing user behavior, preferences, and historical data, AI algorithms can dynamically adjust website content, layouts, and recommendations for each individual visitor. This level of personalization leads to higher engagement, increased conversion rates, and greater user satisfaction.
+-- Create a policy that allows admin users to perform all actions
+CREATE POLICY "Allow full access for admins" ON posts
+FOR ALL USING (true) WITH CHECK (true);
 
-The future points towards even deeper integration. We can expect AI to play a crucial role in automated testing, identifying and fixing bugs before they reach production. Furthermore, AI-driven design tools will be able to generate aesthetically pleasing and user-friendly layouts based on simple text descriptions, bridging the gap between idea and implementation. As we move forward, the collaboration between human developers and AI assistants will be key to building the next generation of intelligent, responsive, and highly engaging web experiences.', '{"AI", "Web Development", "Latest Trends"}'),
-('a-deep-dive-into-react-server-components', 'A Deep Dive into React Server Components', 'John Smith', '2024-07-18', 'https://placehold.co/1200x600', 'server code', 'Understand the what, why, and how of React Server Components and how they are changing the game for performance and data fetching.', 'React Server Components (RSCs) represent a paradigm shift in how we build React applications, allowing us to write components that run exclusively on the server. This innovation, introduced by the React team, aims to solve long-standing challenges related to bundle size, data fetching, and initial page load times.
+-- Enable Row Level Security for the admin_users table
+ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 
-Unlike traditional React components that run on the client, RSCs execute during the build process or on-demand on the server. They have no client-side JavaScript footprint, which significantly reduces the amount of code sent to the browser. This results in faster initial loads and a more responsive user experience, especially on slower networks or less powerful devices.
+-- Create a policy that allows admin users to read their own data
+CREATE POLICY "Allow admin read access" ON admin_users
+FOR SELECT USING (true);
 
-One of the key advantages of Server Components is direct access to server-side data sources like databases, file systems, or internal APIs without the need for an intermediate API layer. This simplifies the data fetching logic, co-locating it with the component that needs it, and eliminates client-server request waterfalls that can slow down applications.
+-- Set up Supabase storage for post images
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('posts', 'posts', true)
+ON CONFLICT (id) DO NOTHING;
 
-It''s important to understand that RSCs are not a replacement for Client Components. Instead, they work together. A single application can be a tree of components where Server Components and Client Components are interleaved. This hybrid model allows developers to choose the best rendering environment for each part of their application, optimizing for both performance and interactivity. Mastering this new architecture will be essential for modern React developers looking to build highly performant and scalable applications.', '{"Web Development", "React"}'),
-('mastering-tailwind-css-gradients', 'Mastering Tailwind CSS Gradients', 'Emily Carter', '2024-07-15', 'https://placehold.co/1200x600', 'colorful gradient', 'Learn how to create stunning gradients using Tailwind CSS utility classes, from simple linear gradients to complex, multi-color designs.', 'Gradients are a powerful design tool that can add depth, vibrancy, and a modern feel to any website. With Tailwind CSS, creating beautiful gradients is a breeze thanks to its intuitive utility-first approach. Forget writing complex CSS; you can define everything directly in your HTML.
+CREATE POLICY "Allow public read access for post images" ON storage.objects
+FOR SELECT USING (bucket_id = 'posts');
 
-The core of Tailwind''s gradient system lies in the `bg-gradient-to-{direction}` utilities. You can specify the direction, such as `bg-gradient-to-r` for a left-to-right gradient, or even diagonal directions like `bg-gradient-to-tr` for top-right.
+CREATE POLICY "Allow insert for post images" ON storage.objects
+FOR INSERT WITH CHECK (bucket_id = 'posts');
 
-Once you''ve set the direction, you define the colors. This is done with the `from-{color}`, `via-{color}`, and `to-{color}` utilities. For example, `from-blue-500 to-purple-600` creates a smooth transition from blue to purple. You can add intermediate colors with `via-{color}` to create more complex, multi-stop gradients.
+CREATE POLICY "Allow update for post images" ON storage.objects
+FOR UPDATE USING (bucket_id = 'posts');
 
-But Tailwind doesn''t stop there. You can control the position of your color stops using utilities like `from-10%` or `to-90%`. This gives you precise control over your gradient''s appearance. You can even create text gradients by combining `bg-clip-text` and `text-transparent` with your gradient utilities. This allows for stunning headline effects that are sure to catch the user''s eye. By mastering these simple but powerful utilities, you can elevate your designs and create visually compelling interfaces with ease.', '{"Web Development", "Latest Trends"}'),
-('why-typescript-is-a-game-changer', 'Why TypeScript is a Game-Changer', 'Mark Robinson', '2024-07-12', 'https://placehold.co/1200x600', 'typescript logo', 'Discover why adopting TypeScript can dramatically improve your codebase, enhance team collaboration, and prevent common bugs in your projects.', 'For years, JavaScript has been the lingua franca of the web. However, its dynamic nature can be a double-edged sword, often leading to runtime errors that are hard to trace. This is where TypeScript comes in. As a typed superset of JavaScript, TypeScript introduces static typing to the language, fundamentally changing how we write and maintain code for the better.
-
-The most immediate benefit of TypeScript is error prevention. By catching type-related errors during development (i.e., at compile time), TypeScript prevents a whole class of bugs from ever reaching your users. This static analysis means you can refactor large codebases with confidence, knowing the compiler will flag any inconsistencies.
-
-Secondly, TypeScript vastly improves the developer experience. With types, code editors can provide intelligent autocompletion, precise navigation, and on-the-fly error checking. This not only makes developers more productive but also makes codebases easier to understand and work with, especially for new team members. Types serve as a form of documentation, clearly defining the "shape" of data and the contracts of functions and components.
-
-While there is a learning curve, the investment in adopting TypeScript pays huge dividends in the long run, especially for large-scale applications. It promotes building more robust, maintainable, and scalable software. It''s not just about avoiding errors; it''s about writing clearer, more predictable code and fostering better collaboration within development teams. In the modern web development landscape, TypeScript isn''t just a tool; it''s a game-changer.', '{"Web Development", "Programming"}'),
-('getting-started-with-social-media-marketing', 'Getting Started with Social Media Marketing', 'Laura Evans', '2024-07-10', 'https://placehold.co/1200x600', 'social media icons', 'A beginner''s guide to leveraging social media platforms to grow your brand and engage with your audience effectively.', 'Social media marketing (SMM) has become an indispensable tool for businesses of all sizes. It''s more than just posting updates; it''s about creating a community, building brand identity, and driving business goals. This guide will walk you through the first steps. First, define your goals. Are you looking for brand awareness, lead generation, or direct sales? Your goals will dictate your strategy. Next, identify your target audience. Which platforms do they use? What content do they engage with? Understanding your audience is key to creating content that resonates. Then, choose your platforms. You don''t need to be on every platform. Focus on where your audience is most active, whether it''s Instagram, TikTok, LinkedIn, or Facebook. Finally, create a content calendar. Planning your posts in advance ensures consistency and helps you align your content with your marketing campaigns. Start small, be consistent, and don''t be afraid to experiment to see what works best for your brand.', '{"Social Media Marketing", "Latest Trends"}'),
-('seo-for-developers', 'SEO for Developers: A Technical Guide', 'Tom Chan', '2024-07-08', 'https://placehold.co/1200x600', 'search engine optimization', 'Learn the technical SEO principles that every web developer should know to build websites that rank higher in search results.', 'Search Engine Optimization (SEO) is often seen as a marketing function, but technical implementation is the foundation of any successful SEO strategy. As a developer, you have a critical role to play. Key areas include site speed. A faster site provides a better user experience and is favored by search engines. Use tools like Lighthouse to audit performance and optimize your images, scripts, and server response times. Mobile-friendliness is non-negotiable. With mobile-first indexing, Google primarily uses the mobile version of your site for ranking. Ensure your design is responsive and provides a seamless experience on all devices. A logical site structure and clean URLs are also crucial. They help search engines crawl your site efficiently and understand the relationship between your pages. Finally, implement structured data (like Schema.org) to help search engines understand the content of your pages and enable rich snippets in search results. By focusing on these technical aspects, you can build a strong foundation for SEO success.', '{"Web Development", "Latest Trends"}');
+CREATE POLICY "Allow delete for post images" ON storage.objects
+FOR DELETE USING (bucket_id = 'posts');
