@@ -26,21 +26,16 @@ export function Header() {
 
       // Using an RPC call to a Postgres function to get distinct categories
       // This is often more reliable with RLS policies in place.
-      // Assumes a function `get_distinct_categories` exists. If not, this needs to be created in Supabase SQL editor.
+      // Assumes a function `get_distinct_categories` exists. This should be created via a migration.
       const { data, error } = await supabase.rpc('get_distinct_categories');
 
       if (error) {
-        console.error("Error fetching categories via rpc:", error);
-        // Fallback to direct select, in case RPC is not set up.
-        const { data: selectData, error: selectError } = await supabase.from('posts').select('category');
-        if (selectError) {
-          console.error("Error fetching categories via select:", selectError);
-          return;
-        }
-        processCategories(selectData.map(item => item.category));
-      } else {
-        processCategories(data);
+        console.error("Error fetching categories via rpc. Please ensure the 'get_distinct_categories' function exists and has correct permissions.", error);
+        return;
       }
+      
+      const categories = data.map(item => item.category);
+      processCategories(categories);
     }
 
     function processCategories(categories: (string | null)[]) {
