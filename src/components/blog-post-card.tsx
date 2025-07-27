@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Post } from '@/lib/data';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, User, Folder } from 'lucide-react';
+import { Calendar, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +22,20 @@ function generateSlug(text: string) {
 export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
 
   const categoryLink = post.category ? `/category/${generateSlug(post.category)}` : '#';
+
+  const CategoryBadge = ({ isLink = false }: { isLink?: boolean }) => {
+    if (isLink) {
+        return (
+            <Link href={categoryLink} onClick={(e) => e.stopPropagation()} className="z-10 relative inline-block">
+                <Badge variant="default" className="text-xs">{post.category}</Badge>
+            </Link>
+        )
+    }
+    return (
+        <Badge variant="default" className="text-xs">{post.category}</Badge>
+    )
+  }
+
 
   if (variant === 'featured') {
     return (
@@ -43,9 +57,7 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
           </CardHeader>
           <CardContent className="p-6 absolute bottom-0">
              <div className="mb-2 flex flex-wrap gap-2">
-              <Link href={categoryLink} onClick={(e) => e.stopPropagation()} className="z-10 relative">
-                <Badge variant="default" className="text-xs">{post.category}</Badge>
-              </Link>
+                <CategoryBadge />
             </div>
             <CardTitle className="font-headline text-3xl text-white leading-tight mb-2 group-hover:text-primary transition-colors">
               {post.title}
@@ -102,9 +114,9 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
           </div>
         </CardHeader>
         <CardContent className="flex-grow p-4">
-           <Link href={categoryLink} onClick={(e) => e.stopPropagation()} className="z-10 relative inline-block mb-2">
-            <Badge variant="default" className="text-xs">{post.category}</Badge>
-           </Link>
+           <div className="mb-2">
+                <CategoryBadge />
+           </div>
           <CardTitle className="font-headline text-lg leading-tight mb-2 group-hover:text-primary transition-colors">
             {post.title}
           </CardTitle>
