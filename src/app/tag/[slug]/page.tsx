@@ -8,37 +8,33 @@ interface TagPageProps {
   };
 }
 
-async function getPostsByTag(slug: string): Promise<{ posts: Post[], tagName: string }> {
-  if (!supabase) return { posts: [], tagName: '' };
-  
-  const tagName = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+export default async function TagPage({ params }: TagPageProps) {
+  if (!supabase) {
+      return (
+          <div className="container mx-auto px-4 py-8 text-center">
+              <p>Database not configured.</p>
+          </div>
+      )
+  }
 
-  const { data, error } = await supabase
+  const tagName = params.slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
+  const { data: posts, error } = await supabase
     .from('posts')
-    .ilike('tags', `%${tagName}%`)
+    .select('*')
+    .contains('tags', [tagName])
     .order('date', { ascending: false });
 
   if (error) {
     console.error(`Error fetching posts for tag "${tagName}":`, error);
-    return { posts: [], tagName };
   }
-
-  const filteredPosts = (data || []).filter(post => 
-    post.tags.some(tag => tag.toLowerCase() === tagName.toLowerCase())
-  );
-
-  return { posts: filteredPosts as Post[], tagName };
-}
-
-export default async function TagPage({ params }: TagPageProps) {
-  const { posts, tagName } = await getPostsByTag(params.slug);
 
   if (!posts || posts.length === 0) {
     return (
         <div className="container mx-auto px-4 py-8">
             <section className="my-12 md:my-16">
                 <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-white text-center">
-                {tagName}
+                  {tagName}
                 </h1>
             </section>
             <section className="text-center py-16">
