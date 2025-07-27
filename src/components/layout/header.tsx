@@ -24,9 +24,9 @@ export function Header() {
   useEffect(() => {
     async function fetchCategories() {
       if (!supabase) return;
-
+      
       const { data, error } = await supabase.from('posts').select('category');
-
+      
       if (error) {
         console.error("Error fetching categories:", error);
         return;
@@ -55,7 +55,7 @@ export function Header() {
       <div className="container mx-auto flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="https://placehold.co/150x40.png"
+            src="/artechlogo.png"
             alt="Artechway Logo"
             width={150}
             height={40}
@@ -86,7 +86,7 @@ export function Header() {
               <SheetHeader className="p-4 border-b">
                  <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
                     <Image
-                        src="https://placehold.co/150x40.png"
+                        src="/artechlogo.png"
                         alt="Artechway Logo"
                         width={150}
                         height={40}
