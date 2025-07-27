@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, Rss, X } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,6 @@ export function Header() {
     async function fetchCategories() {
       if (!supabase) return;
 
-      // Fetch all posts and their categories
       const { data, error } = await supabase.from('posts').select('category');
 
       if (error) {
@@ -36,7 +36,6 @@ export function Header() {
     }
 
     function processCategories(categories: (string | null)[]) {
-      // Filter out null/empty categories, get unique values, and sort them
       const uniqueCategories = [...new Set(categories.filter(Boolean))];
       const sortedCategories = uniqueCategories.sort() as string[];
 
@@ -55,10 +54,14 @@ export function Header() {
     <header className="px-4 md:px-6 sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <Rss className="h-8 w-8 text-primary" />
-          <span className="font-headline text-2xl font-bold tracking-tight text-white">
-            Artechway
-          </span>
+          <Image
+            src="https://placehold.co/150x40.png"
+            alt="Artechway Logo"
+            width={150}
+            height={40}
+            priority
+            data-ai-hint="logo tech"
+          />
         </Link>
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
@@ -82,10 +85,14 @@ export function Header() {
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <SheetHeader className="p-4 border-b">
                  <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Rss className="h-8 w-8 text-primary" />
-                    <span className="font-headline text-2xl font-bold tracking-tight text-white">
-                        Artechway
-                    </span>
+                    <Image
+                        src="https://placehold.co/150x40.png"
+                        alt="Artechway Logo"
+                        width={150}
+                        height={40}
+                        priority
+                        data-ai-hint="logo tech"
+                    />
                  </Link>
               </SheetHeader>
               <div className="p-4">
