@@ -57,10 +57,10 @@ export function Header() {
       <div className="container mx-auto flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="https://placehold.co/150x40.png"
+            src="/artechway.png"
             alt="Artechway Logo"
             width={150}
-            height={40}
+            height={30}
             priority
             data-ai-hint="logo tech"
           />
@@ -88,10 +88,10 @@ export function Header() {
               <SheetHeader className="p-4 border-b">
                  <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
                     <Image
-                        src="https://placehold.co/150x40.png"
+                        src="/artechway.png"
                         alt="Artechway Logo"
                         width={150}
-                        height={40}
+                        height={30}
                         priority
                         data-ai-hint="logo tech"
                     />
