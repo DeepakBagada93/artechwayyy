@@ -1,3 +1,4 @@
+
 import { Post } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
@@ -30,22 +31,13 @@ export default async function Home({
     return ['all', ...Array.from(tags)];
   })();
 
-  const filteredPosts = (() => {
-    let filtered = posts;
-
-    if (selectedTag !== 'all') {
-      filtered = filtered.filter((post) => post.tags.includes(selectedTag));
-    }
-
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (post) =>
-          post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    return filtered;
-  })();
+  const filteredPosts = posts.filter(post => {
+    const tagMatch = selectedTag === 'all' || post.tags.includes(selectedTag);
+    const searchMatch = !searchTerm ||
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+    return tagMatch && searchMatch;
+  });
 
   const mainStory = filteredPosts[0];
   const topStories = filteredPosts.slice(1, 5);
