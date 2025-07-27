@@ -15,14 +15,20 @@ export async function generateStaticParams() {
     
     const { data, error } = await supabase.from('posts').select('tags');
     if (error) {
+        console.error('Error fetching tags for static params:', error);
         return [];
     }
 
+    if (!data) return [];
+
+    const generateSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
     const tags = new Set<string>();
     data.forEach(post => {
-        post.tags.forEach(tag => {
-            tags.add(tag.toLowerCase().replace(/\s+/g, '-'));
-        });
+        if (post.tags) {
+            post.tags.forEach(tag => {
+                tags.add(generateSlug(tag));
+            });
+        }
     });
 
     return Array.from(tags).map(slug => ({
@@ -32,6 +38,7 @@ export async function generateStaticParams() {
 
 
 const getCategoryNameFromSlug = (slug: string) => {
+    // This is a simple conversion. For more complex cases, you might need a mapping.
     return slug
         .split('-')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -41,16 +48,17 @@ const getCategoryNameFromSlug = (slug: string) => {
 
 async function getPostsByCategory(slug: string): Promise<{ posts: Post[], categoryName: string }> {
   if (!supabase) return { posts: [], categoryName: '' };
+  
   const categoryName = getCategoryNameFromSlug(slug);
 
   const { data, error } = await supabase
     .from('posts')
     .select('*')
-    .contains('tags', [categoryName])
+    .filter('tags', 'cs', `{${categoryName}}`) // Use contains with curly braces for array
     .order('date', { ascending: false });
 
   if (error) {
-    console.error('Error fetching posts by category:', error);
+    console.error(`Error fetching posts for category "${categoryName}":`, error);
     return { posts: [], categoryName };
   }
 
@@ -61,6 +69,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const { posts, categoryName } = await getPostsByCategory(params.slug);
 
   if (posts.length === 0) {
+    // Instead of notFound(), maybe show a message? Or notFound() is fine if no posts for a category is an error state.
+    // For now we will keep notFound() as it was.
     notFound();
   }
 

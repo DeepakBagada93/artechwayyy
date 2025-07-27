@@ -13,7 +13,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 
-const generateSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
+const generateSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
