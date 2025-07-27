@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { POSTS, Post } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,7 +26,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Home, PlusSquare, Settings, Trash2, FilePenLine } from 'lucide-react';
+import { Home, PlusSquare, Settings, Trash2, FilePenLine, LogOut, User } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -37,13 +38,17 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarSeparator,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
 
 export default function ManagePostsPage() {
   const [posts, setPosts] = useState<Post[]>(POSTS);
   const [postToDelete, setPostToDelete] = useState<Post | null>(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleDelete = () => {
     if (!postToDelete) return;
@@ -55,6 +60,13 @@ export default function ManagePostsPage() {
     });
     setPostToDelete(null);
   };
+  
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('isLoggedIn');
+    }
+    router.push('/login');
+  }
 
   return (
     <SidebarProvider>
@@ -91,6 +103,20 @@ export default function ManagePostsPage() {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
+        <SidebarFooter>
+            <div className="flex items-center gap-2 p-2">
+                <Avatar>
+                    <AvatarFallback><User /></AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col text-sm">
+                    <span className="font-semibold">Admin</span>
+                    <span className="text-muted-foreground">admin@example.com</span>
+                </div>
+                <Button variant="ghost" size="icon" className="ml-auto" onClick={handleLogout}>
+                    <LogOut />
+                </Button>
+            </div>
+        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <div className="container mx-auto px-4 py-8">

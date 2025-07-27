@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Home, PlusSquare, Settings } from 'lucide-react';
+import { Home, LogOut, PlusSquare, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -32,6 +33,7 @@ import {
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarInset,
   SidebarProvider,
@@ -41,6 +43,8 @@ import {
   SidebarMenuButton,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
 
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -57,6 +61,7 @@ const categories = ['Web Development', 'AI', 'Social Media Marketing', 'Latest T
 
 export default function AdminPage() {
   const { toast } = useToast();
+  const router = useRouter();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const form = useForm<PostFormValues>({
@@ -100,6 +105,13 @@ export default function AdminPage() {
     form.reset();
     setPreviewImage(null);
   };
+  
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('isLoggedIn');
+    }
+    router.push('/login');
+  }
 
   return (
     <SidebarProvider>
@@ -136,6 +148,20 @@ export default function AdminPage() {
                 </SidebarMenuItem>
             </SidebarMenu>
         </SidebarContent>
+        <SidebarFooter>
+            <div className="flex items-center gap-2 p-2">
+                <Avatar>
+                    <AvatarFallback><User /></AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col text-sm">
+                    <span className="font-semibold">Admin</span>
+                    <span className="text-muted-foreground">admin@example.com</span>
+                </div>
+                <Button variant="ghost" size="icon" className="ml-auto" onClick={handleLogout}>
+                    <LogOut />
+                </Button>
+            </div>
+        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <div className="container mx-auto px-4 py-8">
