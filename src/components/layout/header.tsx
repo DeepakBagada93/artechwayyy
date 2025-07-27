@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, Rss, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,7 +25,9 @@ export function Header() {
     async function fetchCategories() {
       if (!supabase) return;
       
-      const { data, error } = await supabase.from('posts').select('category');
+      const { data, error } = await supabase
+        .from('posts')
+        .select('category');
       
       if (error) {
         console.error("Error fetching categories:", error);
@@ -55,7 +57,7 @@ export function Header() {
       <div className="container mx-auto flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="/artechlogo.png"
+            src="https://placehold.co/150x40.png"
             alt="Artechway Logo"
             width={150}
             height={40}
@@ -86,7 +88,7 @@ export function Header() {
               <SheetHeader className="p-4 border-b">
                  <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
                     <Image
-                        src="/artechlogo.png"
+                        src="https://placehold.co/150x40.png"
                         alt="Artechway Logo"
                         width={150}
                         height={40}
