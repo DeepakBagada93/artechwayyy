@@ -21,25 +21,25 @@ export function Header() {
   const [navLinks, setNavLinks] = useState<{name: string, href: string}[]>([]);
 
   useEffect(() => {
-    async function fetchTags() {
+    async function fetchCategories() {
         if (!supabase) return;
-        const { data, error } = await supabase.from('posts').select('tags');
+        const { data, error } = await supabase.from('posts').select('category');
         if (error) {
-            console.error("Error fetching tags:", error);
+            console.error("Error fetching categories:", error);
             return;
         }
 
-        const allTags = data.flatMap(post => post.tags);
-        const uniqueTags = [...new Set(allTags)];
-        const sortedTags = uniqueTags.sort();
+        const allCategories = data.map(post => post.category);
+        const uniqueCategories = [...new Set(allCategories)].filter(Boolean); // Filter out null/undefined
+        const sortedCategories = uniqueCategories.sort();
         
-        const links = sortedTags.map(tag => ({
-            name: tag,
-            href: `/tag/${generateSlug(tag)}`
+        const links = sortedCategories.map(category => ({
+            name: category,
+            href: `/category/${generateSlug(category)}`
         }));
         setNavLinks(links);
     }
-    fetchTags();
+    fetchCategories();
   }, [])
 
 

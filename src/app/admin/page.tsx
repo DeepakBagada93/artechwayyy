@@ -150,6 +150,7 @@ export default function AdminPage() {
         title: data.title,
         content: data.content,
         author: data.author,
+        category: data.category,
         tags: data.tags.split(',').map(tag => tag.trim()),
         slug: slug,
         image: publicUrlData.publicUrl,

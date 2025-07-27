@@ -121,7 +121,7 @@ export default function EditPostPage() {
           title: fetchedPost.title,
           content: fetchedPost.content,
           author: fetchedPost.author,
-          category: fetchedPost.tags.length > 0 ? fetchedPost.tags[0] : '', // Simple assumption
+          category: fetchedPost.category,
           tags: fetchedPost.tags.join(', '),
           image: fetchedPost.image,
         });
@@ -176,6 +176,7 @@ export default function EditPostPage() {
         title: data.title,
         content: data.content,
         author: data.author,
+        category: data.category,
         tags: data.tags.split(',').map(tag => tag.trim()),
         image: imageUrl,
         excerpt: data.content.substring(0, 150) + '...',
@@ -363,7 +364,7 @@ export default function EditPostPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a category" />
