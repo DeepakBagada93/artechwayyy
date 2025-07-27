@@ -24,21 +24,19 @@ export function Header() {
     async function fetchCategories() {
       if (!supabase) return;
 
-      // Using an RPC call to a Postgres function to get distinct categories
-      // This is often more reliable with RLS policies in place.
-      // Assumes a function `get_distinct_categories` exists. This should be created via a migration.
-      const { data, error } = await supabase.rpc('get_distinct_categories');
+      // Fetch all posts and their categories
+      const { data, error } = await supabase.from('posts').select('category');
 
       if (error) {
-        console.error("Error fetching categories via rpc. Please ensure the 'get_distinct_categories' function exists and has correct permissions.", error);
+        console.error("Error fetching categories:", error);
         return;
       }
       
-      const categories = data.map((item: any) => item.category);
-      processCategories(categories);
+      processCategories(data.map(p => p.category));
     }
 
     function processCategories(categories: (string | null)[]) {
+      // Filter out null/empty categories, get unique values, and sort them
       const uniqueCategories = [...new Set(categories.filter(Boolean))];
       const sortedCategories = uniqueCategories.sort() as string[];
 
