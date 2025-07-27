@@ -1,46 +1,36 @@
-
-'use client';
-
-import { useState, useMemo, useEffect } from 'react';
 import { Post } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
-import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Typewriter } from '@/components/typewriter';
+import { BlogFilters } from '@/components/blog-filters';
 
-export default function Home() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTag, setSelectedTag] = useState('all');
-  const [posts, setPosts] = useState<Post[]>([]);
+async function getPosts(): Promise<Post[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase.from('posts').select('*').order('date', { ascending: false });
+  if (error) {
+    console.error('Error fetching posts:', error);
+    return [];
+  }
+  return data as Post[];
+}
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      if (!supabase) return;
-      const { data, error } = await supabase.from('posts').select('*').order('date', { ascending: false });
-      if (error) {
-        console.error('Error fetching posts:', error);
-      } else {
-        setPosts(data as Post[]);
-      }
-    };
-    fetchPosts();
-  }, []);
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
+  const posts = await getPosts();
 
-  const allTags = useMemo(() => {
+  const searchTerm = (searchParams?.search as string) || '';
+  const selectedTag = (searchParams?.tag as string) || 'all';
+
+  const allTags = (() => {
     const tags = new Set<string>();
     posts.forEach((post) => post.tags.forEach((tag) => tags.add(tag)));
     return ['all', ...Array.from(tags)];
-  }, [posts]);
+  })();
 
-  const filteredPosts = useMemo(() => {
+  const filteredPosts = (() => {
     let filtered = posts;
 
     if (selectedTag !== 'all') {
@@ -55,7 +45,7 @@ export default function Home() {
       );
     }
     return filtered;
-  }, [searchTerm, selectedTag, posts]);
+  })();
 
   const mainStory = filteredPosts[0];
   const topStories = filteredPosts.slice(1, 5);
@@ -75,32 +65,7 @@ export default function Home() {
         </p>
       </section>
 
-      <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-        <div className="relative md:col-span-2">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search articles..."
-            className="pl-10 h-12 text-base w-full"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div>
-          <Select value={selectedTag} onValueChange={setSelectedTag}>
-            <SelectTrigger className="h-12 text-base">
-              <SelectValue placeholder="Filter by tag" />
-            </SelectTrigger>
-            <SelectContent>
-              {allTags.map((tag) => (
-                <SelectItem key={tag} value={tag}>
-                  {tag === 'all' ? 'All Topics' : tag}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      <BlogFilters allTags={allTags} />
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {filteredPosts.length > 0 ? (

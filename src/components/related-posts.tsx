@@ -1,48 +1,31 @@
-
-'use client';
-
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getRelatedPosts } from '@/app/actions';
+import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight } from 'lucide-react';
 
 interface RelatedPostsProps {
   currentPostSlug: string;
 }
 
-export function RelatedPosts({ currentPostSlug }: RelatedPostsProps) {
-  const [related, setRelated] = useState<{ title: string; slug: string }[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+async function getRelatedPosts(currentPostSlug: string): Promise<{ title: string; slug: string }[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('posts')
+    .select('title, slug')
+    .not('slug', 'eq', currentPostSlug)
+    .limit(3);
 
-  useEffect(() => {
-    async function fetchRelated() {
-      setIsLoading(true);
-      const relatedData = await getRelatedPosts(currentPostSlug);
-      setRelated(relatedData);
-      setIsLoading(false);
-    }
-    fetchRelated();
-  }, [currentPostSlug]);
-
-  if (isLoading) {
-    return (
-      <Card className="bg-card/50 border-border/50">
-        <CardHeader>
-          <CardTitle className="font-headline text-2xl">Related Articles</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex items-center justify-between">
-              <Skeleton className="h-5 w-3/4" />
-              <Skeleton className="h-5 w-5 rounded-full" />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-    );
+  if (error) {
+    console.error('Error fetching related posts:', error);
+    return [];
   }
+  
+  return data || [];
+}
+
+
+export async function RelatedPosts({ currentPostSlug }: RelatedPostsProps) {
+  const related = await getRelatedPosts(currentPostSlug);
 
   if (related.length === 0) {
     return null; // Don't show the section if there are no related posts
