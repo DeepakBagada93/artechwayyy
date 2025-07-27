@@ -18,18 +18,12 @@ export default async function Home({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const posts = await getPosts();
+  const allPosts = await getPosts();
 
   const searchTerm = (searchParams?.search as string) || '';
   const selectedTag = (searchParams?.tag as string) || 'all';
 
-  const allTags = (() => {
-    const tags = new Set<string>();
-    posts.forEach((post) => post.tags.forEach((tag) => tags.add(tag)));
-    return ['all', ...Array.from(tags)];
-  })();
-
-  const filteredPosts = posts.filter(post => {
+  const filteredPosts = allPosts.filter(post => {
     const tagMatch = selectedTag === 'all' || post.tags.includes(selectedTag);
     const searchMatch = !searchTerm ||
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -56,17 +50,16 @@ export default async function Home({
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {filteredPosts.length > 0 ? (
-          <>
-            {/* Main Story */}
-            <div className="lg:col-span-2">
-              <h2 className="text-3xl font-headline mb-4 border-b-2 border-primary pb-2">
-                Top Story
-              </h2>
-              {mainStory && <BlogPostCard post={mainStory} variant="featured" />}
-            </div>
-
-            {/* Side Stories */}
+        {mainStory && (
+          <div className="lg:col-span-2">
+            <h2 className="text-3xl font-headline mb-4 border-b-2 border-primary pb-2">
+              Top Story
+            </h2>
+            <BlogPostCard post={mainStory} variant="featured" />
+          </div>
+        )}
+        
+        {topStories.length > 0 && (
             <div className="lg:col-span-1 space-y-4">
               <h2 className="text-3xl font-headline mb-4 border-b-2 border-primary pb-2">
                 Trending
@@ -75,30 +68,30 @@ export default async function Home({
                 <BlogPostCard key={post.slug} post={post} variant="compact" />
               ))}
             </div>
-
-            {/* Other Stories */}
-            {otherStories.length > 0 && (
-               <div className="lg:col-span-3 mt-8">
-                 <h2 className="text-3xl font-headline mb-4 border-b-2 border-primary pb-2">
-                  More News
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {otherStories.map((post) => (
-                    <BlogPostCard key={post.slug} post={post} />
-                  ))}
-                </div>
-               </div>
-            )}
-          </>
-        ) : (
-          <div className="lg:col-span-3 text-center py-16">
-            <h2 className="text-2xl font-headline">No posts found</h2>
-            <p className="text-muted-foreground mt-2">
-              Try adjusting your search or filter.
-            </p>
-          </div>
         )}
       </section>
+
+      {otherStories.length > 0 && (
+        <section className="mt-12">
+            <h2 className="text-3xl font-headline mb-4 border-b-2 border-primary pb-2">
+            More News
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {otherStories.map((post) => (
+                <BlogPostCard key={post.slug} post={post} />
+            ))}
+            </div>
+        </section>
+      )}
+
+      {allPosts.length === 0 && (
+         <div className="text-center py-16">
+            <h2 className="text-2xl font-headline">No posts found</h2>
+            <p className="text-muted-foreground mt-2">
+              It looks like there are no posts here yet.
+            </p>
+          </div>
+      )}
     </div>
   );
 }
