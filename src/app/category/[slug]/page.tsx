@@ -10,6 +10,27 @@ interface CategoryPageProps {
   };
 }
 
+export async function generateStaticParams() {
+    if (!supabase) return [];
+    
+    const { data, error } = await supabase.from('posts').select('tags');
+    if (error) {
+        return [];
+    }
+
+    const tags = new Set<string>();
+    data.forEach(post => {
+        post.tags.forEach(tag => {
+            tags.add(tag.toLowerCase().replace(/\s+/g, '-'));
+        });
+    });
+
+    return Array.from(tags).map(slug => ({
+        slug,
+    }));
+}
+
+
 const getCategoryNameFromSlug = (slug: string) => {
     return slug
         .split('-')
@@ -40,8 +61,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const { posts, categoryName } = await getPostsByCategory(params.slug);
 
   if (posts.length === 0) {
-    // You might want a more specific "no posts in this category" message
-    // but for now, we can show a generic not found.
     notFound();
   }
 
