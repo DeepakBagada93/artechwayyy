@@ -1,13 +1,17 @@
--- Add the 'category' column to the 'posts' table
-ALTER TABLE "public"."posts"
-ADD COLUMN "category" "text" NULL;
+-- Add category column to posts table
+alter table posts
+add column category text;
 
--- Backfill existing posts with a default category if needed
-UPDATE "public"."posts"
-SET "category" = 'General'
-WHERE "category" IS NULL;
+-- Create a function to get distinct categories
+create or replace function get_distinct_categories()
+returns table(category text) as $$
+begin
+  return query
+  select distinct p.category
+  from posts p
+  where p.category is not null;
+end;
+$$ language plpgsql;
 
--- It's a good practice to set it as NOT NULL after backfilling
--- if all posts should have a category going forward.
--- ALTER TABLE "public"."posts"
--- ALTER COLUMN "category" SET NOT NULL;
+-- Grant execute permission on the function to the anon role
+grant execute on function get_distinct_categories() to anon;

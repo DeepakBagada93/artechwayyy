@@ -22,26 +22,40 @@ export function Header() {
 
   useEffect(() => {
     async function fetchCategories() {
-        if (!supabase) return;
-        
-        const { data, error } = await supabase.from('posts').select('category');
+      if (!supabase) return;
 
-        if (error) {
-            console.error("Error fetching categories:", error);
-            return;
+      // Using an RPC call to a Postgres function to get distinct categories
+      // This is often more reliable with RLS policies in place.
+      // Assumes a function `get_distinct_categories` exists. If not, this needs to be created in Supabase SQL editor.
+      const { data, error } = await supabase.rpc('get_distinct_categories');
+
+      if (error) {
+        console.error("Error fetching categories via rpc:", error);
+        // Fallback to direct select, in case RPC is not set up.
+        const { data: selectData, error: selectError } = await supabase.from('posts').select('category');
+        if (selectError) {
+          console.error("Error fetching categories via select:", selectError);
+          return;
         }
-
-        const uniqueCategories = [...new Set(data.map(item => item.category).filter(Boolean))];
-        const sortedCategories = uniqueCategories.sort();
-        
-        const links = sortedCategories.map((category: string) => ({
-            name: category,
-            href: `/category/${generateSlug(category)}`
-        }));
-        setNavLinks(links);
+        processCategories(selectData.map(item => item.category));
+      } else {
+        processCategories(data);
+      }
     }
+
+    function processCategories(categories: (string | null)[]) {
+      const uniqueCategories = [...new Set(categories.filter(Boolean))];
+      const sortedCategories = uniqueCategories.sort() as string[];
+
+      const links = sortedCategories.map((category: string) => ({
+        name: category,
+        href: `/category/${generateSlug(category)}`
+      }));
+      setNavLinks(links);
+    }
+    
     fetchCategories();
-  }, [])
+  }, []);
 
 
   return (
