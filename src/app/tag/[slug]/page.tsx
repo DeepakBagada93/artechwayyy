@@ -1,4 +1,3 @@
-
 import { Post } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
@@ -9,29 +8,14 @@ interface TagPageProps {
   };
 }
 
-const getTagNameFromSlug = (slug: string) => {
-    if (!slug) return '';
-    // Handle multi-word tags like "social-media-marketing"
-    if (slug.includes('-')) {
-         return slug
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-    }
-    // Handle single word tags like "ai"
-    return slug.toUpperCase();
-}
-
-
 async function getPostsByTag(slug: string): Promise<{ posts: Post[], tagName: string }> {
   if (!supabase) return { posts: [], tagName: '' };
   
-  const tagName = getTagNameFromSlug(slug);
+  const tagName = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
   const { data, error } = await supabase
     .from('posts')
-    .select('*')
-    .filter('tags', 'cs', `{${tagName}}`)
+    .ilike('tags', `%${tagName}%`)
     .order('date', { ascending: false });
 
   if (error) {
@@ -39,7 +23,11 @@ async function getPostsByTag(slug: string): Promise<{ posts: Post[], tagName: st
     return { posts: [], tagName };
   }
 
-  return { posts: (data || []) as Post[], tagName };
+  const filteredPosts = (data || []).filter(post => 
+    post.tags.some(tag => tag.toLowerCase() === tagName.toLowerCase())
+  );
+
+  return { posts: filteredPosts as Post[], tagName };
 }
 
 export default async function TagPage({ params }: TagPageProps) {
