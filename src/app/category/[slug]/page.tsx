@@ -26,7 +26,7 @@ async function getPostsByCategory(slug: string): Promise<{ posts: Post[], catego
   const { data, error } = await supabase
     .from('posts')
     .select('*')
-    .filter('tags', 'cs', `{${categoryName}}`)
+    .contains('tags', [categoryName])
     .order('date', { ascending: false });
 
   if (error) {
@@ -77,4 +77,3 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     </div>
   );
 }
-
