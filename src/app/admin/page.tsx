@@ -53,7 +53,7 @@ const postSchema = z.object({
 
 type PostFormValues = z.infer<typeof postSchema>;
 
-const categories = ['Web Development', 'AI', 'Social Media', 'Design', 'SEO'];
+const categories = ['Web Development', 'AI', 'Social Media Marketing', 'Latest Trends'];
 
 export default function AdminPage() {
   const { toast } = useToast();

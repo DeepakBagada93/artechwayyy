@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -18,9 +19,8 @@ export function Header() {
   const navLinks = [
     { name: 'Web Development', href: '/?tag=Web+Development' },
     { name: 'AI', href: '/?tag=AI' },
-    { name: 'Social Media', href: '/?tag=Social+Media' },
-    { name: 'Design', href: '/?tag=Design' },
-    { name: 'SEO', href: '/?tag=SEO' },
+    { name: 'Social Media Marketing', href: '/?tag=Social+Media+Marketing' },
+    { name: 'Latest Trends', href: '/?tag=Latest+Trends' },
   ];
 
   return (
