@@ -1,13 +1,19 @@
 
 'use server';
 
-import { POSTS } from '@/lib/data';
+import { supabase } from '@/lib/supabaseClient';
 
 export async function getRelatedPosts(currentPostSlug: string): Promise<{ title: string; slug: string }[]> {
-  // Simple logic to get some posts, excluding the current one.
-  // In a real app, this would be a more sophisticated recommendation logic.
-  return POSTS
-    .filter(post => post.slug !== currentPostSlug)
-    .slice(0, 3)
-    .map(post => ({ title: post.title, slug: post.slug }));
+  const { data, error } = await supabase
+    .from('posts')
+    .select('title, slug')
+    .not('slug', 'eq', currentPostSlug)
+    .limit(3);
+
+  if (error) {
+    console.error('Error fetching related posts:', error);
+    return [];
+  }
+  
+  return data || [];
 }

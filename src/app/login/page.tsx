@@ -26,6 +26,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Rss } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -53,25 +54,31 @@ export default function LoginPage() {
     },
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    // This is a simulation. In a real app, you'd verify credentials.
-    console.log('Login attempt:', data);
-    if (data.email === 'admin@example.com' && data.password === 'password') {
-      // Set a flag in localStorage to simulate being logged in
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('isLoggedIn', 'true');
-      }
-      toast({
-        title: 'Login Successful!',
-        description: 'Redirecting to the admin dashboard...',
-      });
-      router.push('/admin');
+  const onSubmit = async (data: LoginFormValues) => {
+    const { data: user, error } = await supabase
+        .from('admin_users')
+        .select('*')
+        .eq('email', data.email)
+        .eq('password', data.password) // In production, use Supabase Auth with hashed passwords
+        .single();
+
+    if (error || !user) {
+        console.error('Login error:', error);
+        toast({
+            variant: 'destructive',
+            title: 'Login Failed',
+            description: 'Invalid email or password. Please try again.',
+        });
     } else {
-      toast({
-        variant: 'destructive',
-        title: 'Login Failed',
-        description: 'Invalid email or password. Please try again.',
-      });
+        // Set a flag in localStorage to simulate being logged in
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('isLoggedIn', 'true');
+        }
+        toast({
+            title: 'Login Successful!',
+            description: 'Redirecting to the admin dashboard...',
+        });
+        router.push('/admin');
     }
   };
 

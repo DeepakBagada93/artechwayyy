@@ -44,6 +44,7 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { supabase } from '@/lib/supabaseClient';
 
 
 const postSchema = z.object({
@@ -58,6 +59,10 @@ const postSchema = z.object({
 type PostFormValues = z.infer<typeof postSchema>;
 
 const categories = ['Web Development', 'AI', 'Social Media Marketing', 'Latest Trends'];
+
+function generateSlug(title: string) {
+    return title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+}
 
 export default function AdminPage() {
   const { toast } = useToast();
@@ -76,9 +81,6 @@ export default function AdminPage() {
     },
   });
 
-  const { handleSubmit, control, watch } = form;
-  const imageFile = watch('image');
-
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -95,15 +97,52 @@ export default function AdminPage() {
   };
 
 
-  const onSubmit = (data: PostFormValues) => {
-    console.log('Creating post:', { ...data, image: data.image[0].name });
-    // Here you would typically send the data to your backend to save the post
-    toast({
-      title: 'Post Created!',
-      description: 'The new blog post has been successfully created (simulation).',
-    });
-    form.reset();
-    setPreviewImage(null);
+  const onSubmit = async (data: PostFormValues) => {
+    const imageFile = data.image[0] as File;
+    const slug = generateSlug(data.title);
+    const imagePath = `${slug}-${imageFile.name}`;
+
+    // 1. Upload image to Supabase Storage
+    const { data: imageData, error: imageError } = await supabase.storage
+        .from('posts')
+        .upload(imagePath, imageFile);
+
+    if (imageError) {
+        console.error('Image upload error:', imageError);
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to upload image.' });
+        return;
+    }
+    
+    // 2. Get public URL for the uploaded image
+    const { data: publicUrlData } = supabase.storage
+        .from('posts')
+        .getPublicUrl(imageData.path);
+
+    // 3. Insert post data into the database
+    const postData = {
+        title: data.title,
+        content: data.content,
+        author: data.author,
+        tags: data.tags.split(',').map(tag => tag.trim()),
+        slug: slug,
+        image: publicUrlData.publicUrl,
+        excerpt: data.content.substring(0, 150) + '...',
+    };
+
+    const { error: postError } = await supabase.from('posts').insert([postData]);
+
+    if (postError) {
+        console.error('Post creation error:', postError);
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to create post.' });
+    } else {
+        toast({
+          title: 'Post Created!',
+          description: 'The new blog post has been successfully created.',
+        });
+        form.reset();
+        setPreviewImage(null);
+        router.push('/admin/manage');
+    }
   };
   
   const handleLogout = () => {
@@ -177,9 +216,9 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
-                    control={control}
+                    control={form.control}
                     name="title"
                     render={({ field }) => (
                       <FormItem>
@@ -193,7 +232,7 @@ export default function AdminPage() {
                   />
 
                   <FormField
-                    control={control}
+                    control={form.control}
                     name="content"
                     render={({ field }) => (
                        <FormItem>
@@ -212,7 +251,7 @@ export default function AdminPage() {
                   />
 
                   <FormField
-                    control={control}
+                    control={form.control}
                     name="image"
                     render={({ field }) => (
                         <FormItem>
@@ -232,7 +271,7 @@ export default function AdminPage() {
 
 
                    <FormField
-                    control={control}
+                    control={form.control}
                     name="author"
                     render={({ field }) => (
                       <FormItem>
@@ -246,7 +285,7 @@ export default function AdminPage() {
                   />
                   
                   <FormField
-                    control={control}
+                    control={form.control}
                     name="category"
                     render={({ field }) => (
                       <FormItem>
@@ -271,7 +310,7 @@ export default function AdminPage() {
                   />
 
                   <FormField
-                    control={control}
+                    control={form.control}
                     name="tags"
                     render={({ field }) => (
                       <FormItem>

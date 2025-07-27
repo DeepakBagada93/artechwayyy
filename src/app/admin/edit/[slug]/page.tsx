@@ -1,12 +1,13 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter, notFound } from 'next/navigation';
-import { POSTS } from '@/lib/data';
+import { Post } from '@/lib/data';
+import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,6 +46,7 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -62,30 +64,52 @@ const categories = ['Web Development', 'AI', 'Social Media Marketing', 'Latest T
 export default function EditPostPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const { toast } = useToast();
-  const post = POSTS.find((p) => p.slug === params.slug);
-  
-  if (!post) {
-    notFound();
-  }
-  
-  const [previewImage, setPreviewImage] = useState<string | null>(post.image);
-
+  const [post, setPost] = useState<Post | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const form = useForm<PostFormValues>({
     resolver: zodResolver(postSchema),
     defaultValues: {
-      title: post.title,
-      content: post.content,
-      author: post.author,
-      // Assuming first tag is the category for simplicity
-      category: post.tags.length > 0 ? post.tags[0] : '', 
-      tags: post.tags.join(', '),
-      image: post.image,
+        title: '',
+        content: '',
+        author: '',
+        category: '',
+        tags: '',
+        image: null,
     },
   });
 
-  const { handleSubmit, control, watch } = form;
-
+  useEffect(() => {
+    const fetchPost = async () => {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('slug', params.slug)
+        .single();
+      
+      if (error || !data) {
+        console.error('Error fetching post for editing:', error);
+        notFound();
+      } else {
+        const fetchedPost = data as Post;
+        setPost(fetchedPost);
+        form.reset({
+          title: fetchedPost.title,
+          content: fetchedPost.content,
+          author: fetchedPost.author,
+          category: fetchedPost.tags.length > 0 ? fetchedPost.tags[0] : '', // Simple assumption
+          tags: fetchedPost.tags.join(', '),
+          image: fetchedPost.image,
+        });
+        setPreviewImage(fetchedPost.image);
+      }
+      setIsLoading(false);
+    };
+    fetchPost();
+  }, [params.slug, form]);
+  
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -95,23 +119,62 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
       };
       reader.readAsDataURL(file);
       form.setValue('image', event.target.files);
-    } else {
-        // If no file is selected, keep the old image
-        setPreviewImage(post.image);
-        form.setValue('image', post.image);
+    } else if (post) {
+      setPreviewImage(post.image);
+      form.setValue('image', post.image);
     }
   };
 
+  const onSubmit = async (data: PostFormValues) => {
+    if (!post) return;
 
-  const onSubmit = (data: PostFormValues) => {
-    const imageName = typeof data.image === 'string' ? data.image : data.image[0].name;
-    console.log('Updating post:', { ...data, image: imageName });
-    // This is a simulation. In a real app, you'd call an API to update the post.
-    toast({
-      title: 'Post Updated!',
-      description: 'The blog post has been successfully updated (simulation).',
-    });
-    router.push('/admin/manage');
+    let imageUrl = post.image;
+    // Check if a new image file was uploaded
+    if (data.image && typeof data.image !== 'string') {
+        const imageFile = data.image[0] as File;
+        const imagePath = `${post.slug}-${Date.now()}-${imageFile.name}`;
+
+        const { data: imageData, error: imageError } = await supabase.storage
+            .from('posts')
+            .upload(imagePath, imageFile, { upsert: true });
+
+        if (imageError) {
+            console.error('Image update error:', imageError);
+            toast({ variant: 'destructive', title: 'Error', description: 'Failed to update image.' });
+            return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+            .from('posts')
+            .getPublicUrl(imageData.path);
+        imageUrl = publicUrlData.publicUrl;
+    }
+
+    const postData = {
+        title: data.title,
+        content: data.content,
+        author: data.author,
+        tags: data.tags.split(',').map(tag => tag.trim()),
+        image: imageUrl,
+        excerpt: data.content.substring(0, 150) + '...',
+    };
+
+    const { error: postError } = await supabase
+        .from('posts')
+        .update(postData)
+        .eq('id', post.id);
+
+    if (postError) {
+        console.error('Post update error:', postError);
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to update post.' });
+    } else {
+        toast({
+            title: 'Post Updated!',
+            description: 'The blog post has been successfully updated.',
+        });
+        router.push('/admin/manage');
+        router.refresh(); // To show updated data on manage page
+    }
   };
 
   const handleLogout = () => {
@@ -119,6 +182,26 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
         localStorage.removeItem('isLoggedIn');
     }
     router.push('/login');
+  }
+
+  if (isLoading) {
+    return (
+        <div className="flex h-screen w-full items-center justify-center">
+            <div className="space-y-4 w-full max-w-2xl p-8">
+                <Skeleton className="h-12 w-1/2" />
+                <Skeleton className="h-8 w-1/4" />
+                <div className="space-y-2 pt-8">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-32 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+            </div>
+        </div>
+    );
+  }
+
+  if (!post) {
+      return notFound();
   }
 
   return (
@@ -185,9 +268,9 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
-                    control={control}
+                    control={form.control}
                     name="title"
                     render={({ field }) => (
                       <FormItem>
@@ -201,7 +284,7 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
                   />
 
                   <FormField
-                    control={control}
+                    control={form.control}
                     name="content"
                     render={({ field }) => (
                       <FormItem>
@@ -219,7 +302,7 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
                   />
 
                     <FormField
-                        control={control}
+                        control={form.control}
                         name="image"
                         render={({ field }) => (
                             <FormItem>
@@ -238,7 +321,7 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
                     />
 
                   <FormField
-                    control={control}
+                    control={form.control}
                     name="author"
                     render={({ field }) => (
                       <FormItem>
@@ -252,7 +335,7 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
                   />
 
                   <FormField
-                    control={control}
+                    control={form.control}
                     name="category"
                     render={({ field }) => (
                       <FormItem>
@@ -277,7 +360,7 @@ export default function EditPostPage({ params }: { params: { slug: string } }) {
                   />
 
                   <FormField
-                    control={control}
+                    control={form.control}
                     name="tags"
                     render={({ field }) => (
                       <FormItem>

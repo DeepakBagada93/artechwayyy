@@ -1,8 +1,9 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
-import { POSTS } from '@/lib/data';
+import { useState, useMemo, useEffect } from 'react';
+import { Post } from '@/lib/data';
+import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
@@ -18,29 +19,42 @@ import { Typewriter } from '@/components/typewriter';
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState('all');
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const { data, error } = await supabase.from('posts').select('*').order('date', { ascending: false });
+      if (error) {
+        console.error('Error fetching posts:', error);
+      } else {
+        setPosts(data as Post[]);
+      }
+    };
+    fetchPosts();
+  }, []);
 
   const allTags = useMemo(() => {
     const tags = new Set<string>();
-    POSTS.forEach((post) => post.tags.forEach((tag) => tags.add(tag)));
+    posts.forEach((post) => post.tags.forEach((tag) => tags.add(tag)));
     return ['all', ...Array.from(tags)];
-  }, []);
+  }, [posts]);
 
   const filteredPosts = useMemo(() => {
-    let posts = POSTS;
+    let filtered = posts;
 
     if (selectedTag !== 'all') {
-      posts = posts.filter((post) => post.tags.includes(selectedTag));
+      filtered = filtered.filter((post) => post.tags.includes(selectedTag));
     }
 
     if (searchTerm) {
-      posts = posts.filter(
+      filtered = filtered.filter(
         (post) =>
           post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    return posts;
-  }, [searchTerm, selectedTag]);
+    return filtered;
+  }, [searchTerm, selectedTag, posts]);
 
   const mainStory = filteredPosts[0];
   const topStories = filteredPosts.slice(1, 5);

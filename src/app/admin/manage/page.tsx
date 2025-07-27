@@ -1,10 +1,11 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { POSTS, Post } from '@/lib/data';
+import { Post } from '@/lib/data';
+import { supabase } from '@/lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -45,19 +46,44 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 
 export default function ManagePostsPage() {
-  const [posts, setPosts] = useState<Post[]>(POSTS);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [postToDelete, setPostToDelete] = useState<Post | null>(null);
   const { toast } = useToast();
   const router = useRouter();
 
-  const handleDelete = () => {
+  useEffect(() => {
+    const fetchPosts = async () => {
+        const { data, error } = await supabase.from('posts').select('*').order('date', { ascending: false });
+        if (error) {
+            console.error('Error fetching posts:', error);
+            toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch posts.' });
+        } else {
+            setPosts(data as Post[]);
+        }
+    };
+    fetchPosts();
+  }, [toast]);
+
+
+  const handleDelete = async () => {
     if (!postToDelete) return;
-    // This is a simulation. In a real app, you'd call an API to delete the post.
-    setPosts(posts.filter((p) => p.slug !== postToDelete.slug));
-    toast({
-      title: 'Post Deleted',
-      description: `The post "${postToDelete.title}" has been deleted.`,
-    });
+    
+    const { error } = await supabase.from('posts').delete().eq('id', postToDelete.id);
+
+    if (error) {
+        console.error('Error deleting post:', error);
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: `Failed to delete "${postToDelete.title}".`,
+        });
+    } else {
+        setPosts(posts.filter((p) => p.id !== postToDelete.id));
+        toast({
+          title: 'Post Deleted',
+          description: `The post "${postToDelete.title}" has been deleted.`,
+        });
+    }
     setPostToDelete(null);
   };
   

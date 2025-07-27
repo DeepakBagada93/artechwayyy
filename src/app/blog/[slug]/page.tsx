@@ -1,7 +1,8 @@
 
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { POSTS } from '@/lib/data';
+import { Post } from '@/lib/data';
+import { supabase } from '@/lib/supabaseClient';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, User } from 'lucide-react';
 import { RelatedPosts } from '@/components/related-posts';
@@ -13,14 +14,29 @@ interface BlogPostPageProps {
   };
 }
 
-export function generateStaticParams() {
-  return POSTS.map((post) => ({
+export async function generateStaticParams() {
+  const { data: posts } = await supabase.from('posts').select('slug');
+  return posts?.map((post) => ({
     slug: post.slug,
-  }));
+  })) || [];
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = POSTS.find((p) => p.slug === params.slug);
+async function getPost(slug: string): Promise<Post | null> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error) {
+    console.error('Error fetching post:', error);
+    return null;
+  }
+  return data as Post;
+}
+
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const post = await getPost(params.slug);
 
   if (!post) {
     notFound();
