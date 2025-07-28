@@ -163,7 +163,7 @@ export default function ManagePostsPage() {
             </SidebarFooter>
         </Sidebar>
         <SidebarInset>
-            <div className="container mx-auto px-4 py-8 pt-10">
+            <div className="container mx-auto px-4 py-8" style={{ marginTop: '100px' }}>
                 <div className="flex items-center mb-8 gap-4">
                     <SidebarTrigger />
                     <h1 className="font-headline text-4xl font-bold tracking-tighter text-white">
