@@ -189,7 +189,7 @@ export default function AdminPage() {
             <h2 className="text-xl font-bold px-2">Dashboard</h2>
             </SidebarHeader>
             <SidebarContent>
-                <SidebarMenu>
+                <SidebarMenu style={{ marginTop: '100px' }}>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
                             <Link href="/admin">
