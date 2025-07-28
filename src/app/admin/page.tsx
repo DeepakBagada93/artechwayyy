@@ -9,7 +9,6 @@ import { z } from 'zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Home, LogOut, PlusSquare, Settings, User } from 'lucide-react';
 import Link from 'next/link';
@@ -45,6 +44,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/lib/supabaseClient';
+import { RichTextEditor } from '@/components/rich-text-editor';
 
 
 const postSchema = z.object({
@@ -144,6 +144,10 @@ export default function AdminPage() {
     const { data: publicUrlData } = supabase.storage
         .from('posts')
         .getPublicUrl(imageData.path);
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = data.content;
+    const plainTextContent = tempDiv.textContent || tempDiv.innerText || '';
 
     // 3. Insert post data into the database
     const postData = {
@@ -154,7 +158,7 @@ export default function AdminPage() {
         tags: data.tags.split(',').map(tag => tag.trim()),
         slug: slug,
         image: publicUrlData.publicUrl,
-        excerpt: data.content.substring(0, 150) + '...',
+        excerpt: plainTextContent.substring(0, 150) + '...',
     };
 
     const { error: postError } = await supabase.from('posts').insert([postData]);
@@ -268,11 +272,9 @@ export default function AdminPage() {
                         <FormItem>
                             <FormLabel>Content</FormLabel>
                             <FormControl>
-                            <Textarea
-                                placeholder="Write your blog post here..."
-                                {...field}
-                                rows={15}
-                                className="bg-background/50"
+                            <RichTextEditor
+                                value={field.value}
+                                onChange={field.onChange}
                             />
                             </FormControl>
                             <FormMessage />

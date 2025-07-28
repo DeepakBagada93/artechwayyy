@@ -11,7 +11,6 @@ import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Home, LogOut, PlusSquare, Settings, User } from 'lucide-react';
 import Link from 'next/link';
@@ -47,6 +46,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RichTextEditor } from '@/components/rich-text-editor';
 
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -172,6 +172,10 @@ export default function EditPostPage() {
         imageUrl = publicUrlData.publicUrl;
     }
 
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = data.content;
+    const plainTextContent = tempDiv.textContent || tempDiv.innerText || '';
+
     const postData = {
         title: data.title,
         content: data.content,
@@ -179,7 +183,7 @@ export default function EditPostPage() {
         category: data.category,
         tags: data.tags.split(',').map(tag => tag.trim()),
         image: imageUrl,
-        excerpt: data.content.substring(0, 150) + '...',
+        excerpt: plainTextContent.substring(0, 150) + '...',
     };
 
     const { error: postError } = await supabase
@@ -315,10 +319,9 @@ export default function EditPostPage() {
                             <FormItem>
                                 <FormLabel>Content</FormLabel>
                                 <FormControl>
-                                <Textarea
-                                    {...field}
-                                    rows={15}
-                                    className="bg-background/50"
+                                <RichTextEditor
+                                    value={field.value}
+                                    onChange={field.onChange}
                                 />
                                 </FormControl>
                                 <FormMessage />

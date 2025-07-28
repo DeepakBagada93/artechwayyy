@@ -1,3 +1,7 @@
+
+'use client';
+
+import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Post } from '@/lib/data';
@@ -6,6 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, User } from 'lucide-react';
 import { RelatedPosts } from '@/components/related-posts';
 import { Separator } from '@/components/ui/separator';
+import parse from 'html-react-parser';
+import DOMPurify from 'dompurify';
 
 interface BlogPostPageProps {
   params: {
@@ -13,27 +19,45 @@ interface BlogPostPageProps {
   };
 }
 
-async function getPost(slug: string): Promise<Post | null> {
-    if (!supabase) return null;
-  const { data, error } = await supabase
-    .from('posts')
-    .select('*')
-    .eq('slug', slug)
-    .single();
+export default function BlogPostPage({ params }: BlogPostPageProps) {
+  const [post, setPost] = useState<Post | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (error) {
-    console.error('Error fetching post:', error);
-    return null;
+  useEffect(() => {
+    async function getPost(slug: string) {
+      if (!supabase) {
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('slug', slug)
+        .single();
+
+      if (error) {
+        console.error('Error fetching post:', error);
+        setPost(null);
+      } else {
+        setPost(data as Post);
+      }
+      setIsLoading(false);
+    }
+
+    getPost(params.slug);
+  }, [params.slug]);
+
+  if (isLoading) {
+    return <div className="container mx-auto max-w-4xl px-4 py-12 text-center">Loading post...</div>;
   }
-  return data as Post;
-}
-
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = await getPost(params.slug);
-
+  
   if (!post) {
     notFound();
   }
+
+  // Sanitize the HTML content on the client side
+  const sanitizedContent = typeof window !== 'undefined' ? DOMPurify.sanitize(post.content) : post.content;
 
   return (
     <article className="container mx-auto max-w-4xl px-4 py-12">
@@ -73,9 +97,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       </header>
 
       <div className="prose prose-invert prose-lg max-w-none text-foreground/90 leading-relaxed space-y-6">
-        {post.content.split('\n\n').map((paragraph, index) => (
-          <p key={index}>{paragraph}</p>
-        ))}
+        {parse(sanitizedContent)}
       </div>
       
       <Separator className="my-12 bg-border/20" />

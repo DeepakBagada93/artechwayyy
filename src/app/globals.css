@@ -1,3 +1,6 @@
+
+@import 'react-quill/dist/quill.snow.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -49,4 +52,39 @@
     );
     min-height: 100svh;
   }
+}
+
+/* Custom Quill styles to match the dark theme */
+.ql-snow {
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.ql-toolbar {
+  border-bottom-color: hsl(var(--border)) !important;
+}
+
+.ql-toolbar .ql-picker-label {
+  color: hsl(var(--foreground));
+}
+
+.ql-toolbar .ql-stroke {
+  stroke: hsl(var(--foreground));
+}
+
+.ql-toolbar .ql-fill {
+  fill: hsl(var(--foreground));
+}
+
+.ql-toolbar .ql-picker-options {
+  background-color: hsl(var(--background));
+  border-color: hsl(var(--border));
+}
+
+.ql-editor a {
+    @apply text-primary underline;
+}
+
+.ql-editor h1, .ql-editor h2, .ql-editor h3 {
+    @apply font-headline;
 }
