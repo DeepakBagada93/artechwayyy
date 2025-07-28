@@ -46,7 +46,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { RichTextEditor } from '@/components/rich-text-editor';
+import { Textarea } from '@/components/ui/textarea';
 
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -319,11 +319,16 @@ export default function EditPostPage() {
                             <FormItem>
                                 <FormLabel>Content</FormLabel>
                                 <FormControl>
-                                <RichTextEditor
-                                    value={field.value}
-                                    onChange={field.onChange}
+                                <Textarea
+                                    placeholder="Write your blog post here... You can use Markdown for formatting."
+                                    rows={15}
+                                    className="bg-background/50"
+                                    {...field}
                                 />
                                 </FormControl>
+                                <FormDescription>
+                                    To add a link, use Markdown: `[link text](https://example.com)`
+                                </FormDescription>
                                 <FormMessage />
                             </FormItem>
                             )}

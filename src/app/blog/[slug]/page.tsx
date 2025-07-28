@@ -10,8 +10,22 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, User } from 'lucide-react';
 import { RelatedPosts } from '@/components/related-posts';
 import { Separator } from '@/components/ui/separator';
-import parse from 'html-react-parser';
+import parse, { domToReact } from 'html-react-parser';
 import DOMPurify from 'dompurify';
+
+// Basic markdown to HTML conversion
+function markdownToHtml(markdown: string) {
+    if (!markdown) return '';
+    // Links
+    let html = markdown.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    // Basic bold
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Basic italic
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // Newlines
+    html = html.replace(/\n/g, '<br />');
+    return html;
+}
 
 interface BlogPostPageProps {
   params: {
@@ -56,8 +70,17 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
+  const convertedHtml = markdownToHtml(post.content);
   // Sanitize the HTML content on the client side
-  const sanitizedContent = typeof window !== 'undefined' ? DOMPurify.sanitize(post.content) : post.content;
+  const sanitizedContent = typeof window !== 'undefined' ? DOMPurify.sanitize(convertedHtml) : convertedHtml;
+  
+  const options = {
+    replace: (domNode: any) => {
+      if (domNode.name === 'a') {
+        return <a href={domNode.attribs.href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">{domToReact(domNode.children)}</a>;
+      }
+    }
+  };
 
   return (
     <article className="container mx-auto max-w-4xl px-4 py-12">
@@ -97,7 +120,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
       </header>
 
       <div className="prose prose-invert prose-lg max-w-none text-foreground/90 leading-relaxed space-y-6">
-        {parse(sanitizedContent)}
+        {parse(sanitizedContent, options)}
       </div>
       
       <Separator className="my-12 bg-border/20" />
