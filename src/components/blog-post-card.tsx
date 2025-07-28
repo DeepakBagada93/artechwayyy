@@ -23,16 +23,11 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
 
   const categoryLink = post.category ? `/category/${generateSlug(post.category)}` : '#';
 
-  const CategoryBadge = ({ isLink = false }: { isLink?: boolean }) => {
-    if (isLink) {
-        return (
-            <Link href={categoryLink} onClick={(e) => e.stopPropagation()} className="z-10 relative inline-block">
-                <Badge variant="default" className="text-xs">{post.category}</Badge>
-            </Link>
-        )
-    }
+  const CategoryBadge = () => {
     return (
-        <Badge variant="default" className="text-xs">{post.category}</Badge>
+        <Link href={categoryLink} className="z-10 relative inline-block">
+            <Badge variant="default" className="text-xs">{post.category}</Badge>
+        </Link>
     )
   }
 

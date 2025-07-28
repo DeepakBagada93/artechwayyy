@@ -2,8 +2,10 @@
 'use client';
 
 import React from 'react';
-import ReactQuill from 'react-quill';
+import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 interface RichTextEditorProps {
   value: string;
@@ -34,6 +36,10 @@ const formats = [
 ];
 
 export function RichTextEditor({ value, onChange, className }: RichTextEditorProps) {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+    
   return (
     <div className={className}>
       <ReactQuill
