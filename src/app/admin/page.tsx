@@ -182,189 +182,191 @@ export default function AdminPage() {
   }
 
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-           <h2 className="text-xl font-bold px-2">Dashboard</h2>
-        </SidebarHeader>
-        <SidebarContent>
-            <SidebarMenu>
-                <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                        <Link href="/admin">
-                            <PlusSquare />
-                            <span>Create Post</span>
-                        </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-                 <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                        <Link href="/admin/manage">
-                            <Settings />
-                            <span>Manage Posts</span>
-                        </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarSeparator />
-                <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                        <Link href="/">
-                            <Home />
-                            <span>View Blog</span>
-                        </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter>
-            <div className="flex items-center gap-2 p-2">
-                <Avatar>
-                    <AvatarFallback><User /></AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col text-sm">
-                    <span className="font-semibold">{currentUser?.name ?? 'Admin'}</span>
-                    <span className="text-muted-foreground">{currentUser?.email ?? 'admin@example.com'}</span>
+    <div className="flex-1">
+        <SidebarProvider>
+        <Sidebar>
+            <SidebarHeader>
+            <h2 className="text-xl font-bold px-2">Dashboard</h2>
+            </SidebarHeader>
+            <SidebarContent>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild>
+                            <Link href="/admin">
+                                <PlusSquare />
+                                <span>Create Post</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild>
+                            <Link href="/admin/manage">
+                                <Settings />
+                                <span>Manage Posts</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarSeparator />
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild>
+                            <Link href="/">
+                                <Home />
+                                <span>View Blog</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarContent>
+            <SidebarFooter>
+                <div className="flex items-center gap-2 p-2">
+                    <Avatar>
+                        <AvatarFallback><User /></AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col text-sm">
+                        <span className="font-semibold">{currentUser?.name ?? 'Admin'}</span>
+                        <span className="text-muted-foreground">{currentUser?.email ?? 'admin@example.com'}</span>
+                    </div>
+                    <Button variant="ghost" size="icon" className="ml-auto" onClick={handleLogout}>
+                        <LogOut />
+                    </Button>
                 </div>
-                <Button variant="ghost" size="icon" className="ml-auto" onClick={handleLogout}>
-                    <LogOut />
-                </Button>
-            </div>
-        </SidebarFooter>
-      </Sidebar>
-      <SidebarInset>
-        <div className="container mx-auto px-4 py-8">
-            <div className="flex items-center mb-8">
-                <SidebarTrigger />
-                 <h1 className="font-headline text-4xl font-bold tracking-tighter text-white ml-4">
-                    Create New Post
-                </h1>
-            </div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Create New Blog Post</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Title</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter a catchy title" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="content"
-                    render={({ field }) => (
-                       <FormItem>
-                        <FormLabel>Content</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Write your blog post here..."
-                            {...field}
-                            rows={15}
-                            className="bg-background/50"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="image"
-                    render={({ field }) => (
+            </SidebarFooter>
+        </Sidebar>
+        <SidebarInset>
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex items-center mb-8">
+                    <SidebarTrigger />
+                    <h1 className="font-headline text-4xl font-bold tracking-tighter text-white ml-4">
+                        Create New Post
+                    </h1>
+                </div>
+            <Card>
+                <CardHeader>
+                <CardTitle>Create New Blog Post</CardTitle>
+                </CardHeader>
+                <CardContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <FormField
+                        control={form.control}
+                        name="title"
+                        render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Image</FormLabel>
-                        <FormControl>
-                            <Input type="file" accept="image/*" onChange={handleImageChange} />
-                        </FormControl>
-                        {previewImage && (
-                        <div className="mt-4 relative aspect-video w-full max-w-md overflow-hidden rounded-lg">
-                            <Image src={previewImage} alt="Image preview" fill className="object-cover" />
-                        </div>
+                            <FormLabel>Title</FormLabel>
+                            <FormControl>
+                            <Input placeholder="Enter a catchy title" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
                         )}
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                   />
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="content"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Content</FormLabel>
+                            <FormControl>
+                            <Textarea
+                                placeholder="Write your blog post here..."
+                                {...field}
+                                rows={15}
+                                className="bg-background/50"
+                            />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="image"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Image</FormLabel>
+                            <FormControl>
+                                <Input type="file" accept="image/*" onChange={handleImageChange} />
+                            </FormControl>
+                            {previewImage && (
+                            <div className="mt-4 relative aspect-video w-full max-w-md overflow-hidden rounded-lg">
+                                <Image src={previewImage} alt="Image preview" fill className="object-cover" />
+                            </div>
+                            )}
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
 
 
-                   <FormField
-                    control={form.control}
-                    name="author"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Author</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a category" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {categories.map(category => (
-                                <SelectItem key={category} value={category}>
-                                    {category}
-                                </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                        control={form.control}
+                        name="author"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Author</FormLabel>
+                            <FormControl>
+                            <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    
+                    <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Category</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                                <SelectTrigger>
+                                <SelectValue placeholder="Select a category" />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                {categories.map(category => (
+                                    <SelectItem key={category} value={category}>
+                                        {category}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="tags"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tags</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., AI, Web Development, React"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Enter tags separated by commas.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                        control={form.control}
+                        name="tags"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Tags</FormLabel>
+                            <FormControl>
+                            <Input
+                                placeholder="e.g., AI, Web Development, React"
+                                {...field}
+                            />
+                            </FormControl>
+                            <FormDescription>
+                            Enter tags separated by commas.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
 
-                  <Button type="submit">Create Post</Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+                    <Button type="submit">Create Post</Button>
+                    </form>
+                </Form>
+                </CardContent>
+            </Card>
+            </div>
+        </SidebarInset>
+        </SidebarProvider>
+    </div>
   );
 }
