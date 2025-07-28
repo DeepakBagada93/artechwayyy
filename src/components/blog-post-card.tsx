@@ -3,6 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import type { Post } from '@/lib/data';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, User } from 'lucide-react';
@@ -20,14 +21,20 @@ function generateSlug(text: string) {
 }
 
 export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
-
+  const router = useRouter();
   const categoryLink = post.category ? `/category/${generateSlug(post.category)}` : '#';
+
+  const handleCategoryClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation(); // Stop the click from propagating to the parent Link
+    e.preventDefault();
+    router.push(categoryLink);
+  };
 
   const CategoryBadge = () => {
     return (
-        <Link href={categoryLink} className="z-10 relative inline-block">
+        <div onClick={handleCategoryClick} className="z-10 relative inline-block cursor-pointer">
             <Badge variant="default" className="text-xs">{post.category}</Badge>
-        </Link>
+        </div>
     )
   }
 
