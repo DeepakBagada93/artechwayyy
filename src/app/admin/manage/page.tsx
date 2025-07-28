@@ -163,84 +163,84 @@ export default function ManagePostsPage() {
             </SidebarFooter>
         </Sidebar>
         <SidebarInset>
-            <div className="container mx-auto px-4 py-8">
-            <div className="flex items-center mb-8">
-                <SidebarTrigger />
-                <h1 className="font-headline text-4xl font-bold tracking-tighter text-white ml-4">
-                Manage Posts
-                </h1>
-            </div>
-            <Card>
-                <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <CardTitle>All Blog Posts</CardTitle>
-                        <Button asChild>
-                            <Link href="/admin">
-                                <PlusSquare className="mr-2 h-4 w-4" />
-                                Create New Post
-                            </Link>
-                        </Button>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                <Table>
-                    <TableHeader>
-                    <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Author</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                    {posts.map((post) => (
-                        <TableRow key={post.slug}>
-                        <TableCell className="font-medium">{post.title}</TableCell>
-                        <TableCell>{post.author}</TableCell>
-                        <TableCell>{new Date(post.date).toLocaleDateString()}</TableCell>
-                        <TableCell className="text-right">
-                            <Button asChild variant="ghost" size="icon">
-                            <Link href={`/admin/edit/${post.slug}`}>
-                                <FilePenLine className="h-4 w-4" />
-                                <span className="sr-only">Edit</span>
-                            </Link>
+            <div className="container mx-auto px-4 py-8 pt-10">
+                <div className="flex items-center mb-8 gap-4">
+                    <SidebarTrigger />
+                    <h1 className="font-headline text-4xl font-bold tracking-tighter text-white">
+                        Manage Posts
+                    </h1>
+                </div>
+                <Card>
+                    <CardHeader>
+                        <div className="flex justify-between items-center">
+                            <CardTitle>All Blog Posts</CardTitle>
+                            <Button asChild>
+                                <Link href="/admin">
+                                    <PlusSquare className="mr-2 h-4 w-4" />
+                                    Create New Post
+                                </Link>
                             </Button>
-                            <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setPostToDelete(post)}
-                                >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                                <span className="sr-only">Delete</span>
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently
-                                    delete the post titled &quot;{post.title}&quot;.
-                                </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                <AlertDialogCancel onClick={() => setPostToDelete(null)}>
-                                    Cancel
-                                </AlertDialogCancel>
-                                <AlertDialogAction onClick={handleDelete}>
-                                    Delete
-                                </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                            </AlertDialog>
-                        </TableCell>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                    <Table>
+                        <TableHeader>
+                        <TableRow>
+                            <TableHead>Title</TableHead>
+                            <TableHead>Author</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
-                    ))}
-                    </TableBody>
-                </Table>
-                </CardContent>
-            </Card>
+                        </TableHeader>
+                        <TableBody>
+                        {posts.map((post) => (
+                            <TableRow key={post.slug}>
+                            <TableCell className="font-medium">{post.title}</TableCell>
+                            <TableCell>{post.author}</TableCell>
+                            <TableCell>{new Date(post.date).toLocaleDateString()}</TableCell>
+                            <TableCell className="text-right">
+                                <Button asChild variant="ghost" size="icon">
+                                <Link href={`/admin/edit/${post.slug}`}>
+                                    <FilePenLine className="h-4 w-4" />
+                                    <span className="sr-only">Edit</span>
+                                </Link>
+                                </Button>
+                                <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setPostToDelete(post)}
+                                    >
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                    <span className="sr-only">Delete</span>
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently
+                                        delete the post titled &quot;{post.title}&quot;.
+                                    </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                    <AlertDialogCancel onClick={() => setPostToDelete(null)}>
+                                        Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleDelete}>
+                                        Delete
+                                    </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                                </AlertDialog>
+                            </TableCell>
+                            </TableRow>
+                        ))}
+                        </TableBody>
+                    </Table>
+                    </CardContent>
+                </Card>
             </div>
         </SidebarInset>
         </SidebarProvider>

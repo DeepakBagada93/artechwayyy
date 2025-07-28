@@ -280,144 +280,144 @@ export default function EditPostPage() {
             </SidebarFooter>
         </Sidebar>
         <SidebarInset>
-            <div className="container mx-auto px-4 py-8">
-            <div className="flex items-center mb-8">
-                <SidebarTrigger />
-                <h1 className="font-headline text-4xl font-bold tracking-tighter text-white ml-4">
-                Edit Post
-                </h1>
-            </div>
-            <Card>
-                <CardHeader>
-                <CardTitle>Editing &quot;{post.title}&quot;</CardTitle>
-                </CardHeader>
-                <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <FormField
-                        control={form.control}
-                        name="title"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Title</FormLabel>
-                            <FormControl>
-                            <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="content"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Content</FormLabel>
-                            <FormControl>
-                            <Textarea
-                                {...field}
-                                rows={15}
-                                className="bg-background/50"
-                            />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-
+            <div className="container mx-auto px-4 py-8 pt-10">
+                <div className="flex items-center mb-8 gap-4">
+                    <SidebarTrigger />
+                    <h1 className="font-headline text-4xl font-bold tracking-tighter text-white">
+                        Edit Post
+                    </h1>
+                </div>
+                <Card>
+                    <CardHeader>
+                    <CardTitle>Editing &quot;{post.title}&quot;</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <FormField
                             control={form.control}
-                            name="image"
+                            name="title"
                             render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Image</FormLabel>
+                            <FormItem>
+                                <FormLabel>Title</FormLabel>
                                 <FormControl>
-                                    <Input type="file" accept="image/*" onChange={handleImageChange} />
+                                <Input {...field} />
                                 </FormControl>
-                                {previewImage && (
-                                <div className="mt-4 relative aspect-video w-full max-w-md overflow-hidden rounded-lg">
-                                    <Image src={previewImage} alt="Image preview" fill className="object-cover" />
-                                </div>
-                                )}
                                 <FormMessage />
                             </FormItem>
                             )}
                         />
 
-                    <FormField
-                        control={form.control}
-                        name="author"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Author</FormLabel>
-                            <FormControl>
-                            <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
+                        <FormField
+                            control={form.control}
+                            name="content"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Content</FormLabel>
+                                <FormControl>
+                                <Textarea
+                                    {...field}
+                                    rows={15}
+                                    className="bg-background/50"
+                                />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
 
-                    <FormField
-                        control={form.control}
-                        name="category"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Category</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                <SelectValue placeholder="Select a category" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {categories.map((category) => (
-                                <SelectItem key={category} value={category}>
-                                    {category}
-                                </SelectItem>
-                                ))}
-                            </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="tags"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Tags</FormLabel>
-                            <FormControl>
-                            <Input
-                                placeholder="e.g., AI, Web Development, React"
-                                {...field}
+                            <FormField
+                                control={form.control}
+                                name="image"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Image</FormLabel>
+                                    <FormControl>
+                                        <Input type="file" accept="image/*" onChange={handleImageChange} />
+                                    </FormControl>
+                                    {previewImage && (
+                                    <div className="mt-4 relative aspect-video w-full max-w-md overflow-hidden rounded-lg">
+                                        <Image src={previewImage} alt="Image preview" fill className="object-cover" />
+                                    </div>
+                                    )}
+                                    <FormMessage />
+                                </FormItem>
+                                )}
                             />
-                            </FormControl>
-                            <FormDescription>
-                            Enter tags separated by commas.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
 
-                    <div className="flex gap-2">
-                        <Button type="submit">Update Post</Button>
-                        <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => router.push('/admin/manage')}
-                        >
-                        Cancel
-                        </Button>
-                    </div>
-                    </form>
-                </Form>
-                </CardContent>
-            </Card>
+                        <FormField
+                            control={form.control}
+                            name="author"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Author</FormLabel>
+                                <FormControl>
+                                <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="category"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Category</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                    <SelectValue placeholder="Select a category" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {categories.map((category) => (
+                                    <SelectItem key={category} value={category}>
+                                        {category}
+                                    </SelectItem>
+                                    ))}
+                                </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="tags"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Tags</FormLabel>
+                                <FormControl>
+                                <Input
+                                    placeholder="e.g., AI, Web Development, React"
+                                    {...field}
+                                />
+                                </FormControl>
+                                <FormDescription>
+                                Enter tags separated by commas.
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+
+                        <div className="flex gap-2">
+                            <Button type="submit">Update Post</Button>
+                            <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => router.push('/admin/manage')}
+                            >
+                            Cancel
+                            </Button>
+                        </div>
+                        </form>
+                    </Form>
+                    </CardContent>
+                </Card>
             </div>
         </SidebarInset>
         </SidebarProvider>
