@@ -1,13 +1,23 @@
+
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface RelatedPostsProps {
   currentPostSlug: string;
 }
 
-async function getRelatedPosts(currentPostSlug: string): Promise<{ title: string; slug: string }[]> {
+interface RelatedPost {
+    title: string;
+    slug: string;
+}
+
+async function getRelatedPosts(currentPostSlug: string): Promise<RelatedPost[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('posts')
@@ -24,8 +34,36 @@ async function getRelatedPosts(currentPostSlug: string): Promise<{ title: string
 }
 
 
-export async function RelatedPosts({ currentPostSlug }: RelatedPostsProps) {
-  const related = await getRelatedPosts(currentPostSlug);
+export function RelatedPosts({ currentPostSlug }: RelatedPostsProps) {
+  const [related, setRelated] = useState<RelatedPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchRelated() {
+        setIsLoading(true);
+        const posts = await getRelatedPosts(currentPostSlug);
+        setRelated(posts);
+        setIsLoading(false);
+    }
+    if (currentPostSlug) {
+        fetchRelated();
+    }
+  }, [currentPostSlug]);
+
+  if (isLoading) {
+    return (
+        <Card className="bg-card/50 border-border/50">
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">Related Articles</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+            </CardContent>
+        </Card>
+    )
+  }
 
   if (related.length === 0) {
     return null; // Don't show the section if there are no related posts
