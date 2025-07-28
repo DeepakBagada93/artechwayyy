@@ -1,11 +1,15 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
+import { Skeleton } from './ui/skeleton';
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+const ReactQuill = dynamic(() => import('react-quill'), { 
+    ssr: false,
+    loading: () => <Skeleton className="h-[250px] w-full" />,
+});
 
 interface RichTextEditorProps {
   value: string;
@@ -36,8 +40,14 @@ const formats = [
 ];
 
 export function RichTextEditor({ value, onChange, className }: RichTextEditorProps) {
-    if (typeof window === 'undefined') {
-        return null;
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    if (!isClient) {
+        return <Skeleton className="h-[250px] w-full" />;
     }
     
   return (
