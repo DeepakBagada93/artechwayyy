@@ -129,8 +129,11 @@ export default function EditPostPage() {
       }
       setIsLoading(false);
     };
-    fetchPost();
-  }, [slug, form]);
+
+    if (slug) {
+        fetchPost();
+    }
+  }, [slug, form, notFound]);
   
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

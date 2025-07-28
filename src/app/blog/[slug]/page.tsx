@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Post } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
@@ -27,19 +27,15 @@ function markdownToHtml(markdown: string) {
     return html;
 }
 
-interface BlogPostPageProps {
-  params: {
-    slug: string;
-  };
-}
-
-export default function BlogPostPage({ params }: BlogPostPageProps) {
+export default function BlogPostPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const params = useParams();
+  const slug = params.slug as string;
 
   useEffect(() => {
     async function getPost(slug: string) {
-      if (!supabase) {
+      if (!supabase || !slug) {
         setIsLoading(false);
         return;
       }
@@ -59,8 +55,10 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
       setIsLoading(false);
     }
 
-    getPost(params.slug);
-  }, [params.slug]);
+    if (slug) {
+      getPost(slug);
+    }
+  }, [slug]);
 
   if (isLoading) {
     return <div className="container mx-auto max-w-4xl px-4 py-12 text-center">Loading post...</div>;
