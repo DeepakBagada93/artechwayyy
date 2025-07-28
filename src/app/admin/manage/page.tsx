@@ -171,7 +171,15 @@ export default function ManagePostsPage() {
           </div>
           <Card>
             <CardHeader>
-              <CardTitle>All Blog Posts</CardTitle>
+                <div className="flex justify-between items-center">
+                    <CardTitle>All Blog Posts</CardTitle>
+                    <Button asChild>
+                        <Link href="/admin">
+                            <PlusSquare className="mr-2 h-4 w-4" />
+                            Create New Post
+                        </Link>
+                    </Button>
+                </div>
             </CardHeader>
             <CardContent>
               <Table>
