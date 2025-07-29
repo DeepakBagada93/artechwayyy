@@ -7,6 +7,10 @@ import { Toaster } from '@/components/ui/toaster';
 export const metadata: Metadata = {
   title: 'Artechway',
   description: 'The intersection of art, technology, and the future.',
+  icons: {
+    icon: '/artechway.png',
+    apple: '/artechway.png',
+  }
 };
 
 export default function RootLayout({
