@@ -32,7 +32,11 @@ export default function Home() {
     fetchPosts();
   }, []);
 
-  const postsByCategory = allPosts.reduce((acc, post) => {
+  const featuredPost = allPosts.length > 0 ? allPosts[0] : null;
+  const trendingPosts = allPosts.length > 1 ? allPosts.slice(1, 4) : [];
+  const otherPosts = allPosts.length > 4 ? allPosts.slice(4) : [];
+  
+  const postsByCategory = otherPosts.reduce((acc, post) => {
     const category = post.category || 'Uncategorized';
     if (!acc[category]) {
       acc[category] = [];
@@ -67,42 +71,67 @@ export default function Home() {
       </section>
 
       {isLoading ? (
-        <div className="space-y-12">
-            {[...Array(3)].map((_, i) => (
-                 <div key={i} className="space-y-4">
-                    <Skeleton className="h-10 w-1/4" />
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <Skeleton className="h-96 w-full" />
-                        <Skeleton className="h-96 w-full" />
-                        <Skeleton className="h-96 w-full" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-4">
+                 <Skeleton className="h-10 w-1/4" />
+                 <Skeleton className="h-[480px] w-full" />
+            </div>
+            <div className="lg:col-span-1 space-y-4">
+                 <Skeleton className="h-10 w-1/2" />
+                 <Skeleton className="h-28 w-full" />
+                 <Skeleton className="h-28 w-full" />
+                 <Skeleton className="h-28 w-full" />
+            </div>
+        </div>
+      ) : allPosts.length > 0 ? (
+        <>
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+                {featuredPost && (
+                    <div className="lg:col-span-2">
+                        <h2 className="text-3xl font-headline mb-4 border-b-2 border-primary pb-2">
+                            Top Story
+                        </h2>
+                        <BlogPostCard post={featuredPost} variant="featured" />
                     </div>
-                </div>
-            ))}
-        </div>
+                )}
+                {trendingPosts.length > 0 && (
+                    <div className="lg:col-span-1 space-y-4">
+                         <h2 className="text-3xl font-headline mb-4 border-b-2 border-primary pb-2">
+                            Trending
+                        </h2>
+                        <div className="flex flex-col gap-4">
+                            {trendingPosts.map(post => (
+                                <BlogPostCard key={post.slug} post={post} variant="compact" />
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </section>
+            
+            <div className="space-y-16">
+              {sortedCategories.map(category => (
+                postsByCategory[category] && postsByCategory[category].length > 0 && (
+                    <section key={category}>
+                        <h2 className="text-3xl font-headline mb-6 border-b-2 border-primary pb-2">
+                        {category}
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {postsByCategory[category].map(post => (
+                            <BlogPostCard key={post.slug} post={post} />
+                        ))}
+                        </div>
+                    </section>
+                )
+              ))}
+            </div>
+        </>
       ) : (
-        <div className="space-y-16">
-          {allPosts.length > 0 ? (
-            sortedCategories.map(category => (
-              <section key={category}>
-                <h2 className="text-3xl font-headline mb-6 border-b-2 border-primary pb-2">
-                  {category}
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {postsByCategory[category].map(post => (
-                    <BlogPostCard key={post.slug} post={post} />
-                  ))}
-                </div>
-              </section>
-            ))
-          ) : (
-             <div className="text-center py-16">
-                <h2 className="text-2xl font-headline">No posts found</h2>
-                <p className="text-muted-foreground mt-2">
-                  It looks like there are no posts here yet.
-                </p>
-              </div>
-          )}
-        </div>
+         <div className="text-center py-16">
+            <h2 className="text-2xl font-headline">No posts found</h2>
+            <p className="text-muted-foreground mt-2">
+              It looks like there are no posts here yet.
+            </p>
+          </div>
       )}
     </div>
   );

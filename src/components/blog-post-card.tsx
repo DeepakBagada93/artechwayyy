@@ -8,16 +8,15 @@ import type { Post } from '@/lib/data';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-
-interface BlogPostCardProps {
-  post: Post;
-  variant?: 'default' | 'featured' | 'compact';
-}
 
 function generateSlug(text: string) {
   if (!text) return '';
   return text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+}
+
+interface BlogPostCardProps {
+  post: Post;
+  variant?: 'default' | 'featured' | 'compact';
 }
 
 export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
@@ -25,7 +24,7 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
   const categoryLink = post.category ? `/category/${generateSlug(post.category)}` : '#';
 
   const handleCategoryClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation(); // Stop the click from propagating to the parent Link
+    e.stopPropagation(); 
     e.preventDefault();
     router.push(categoryLink);
   };
@@ -37,7 +36,6 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
         </div>
     )
   }
-
 
   if (variant === 'featured') {
     return (
@@ -63,7 +61,7 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
               <CardTitle className="font-headline text-3xl text-white leading-tight mb-2 group-hover:text-primary transition-colors break-words">
                 {post.title}
               </CardTitle>
-              <p className="text-slate-300 text-sm max-w-prose">{post.excerpt}</p>
+              <p className="text-slate-300 text-sm max-w-prose line-clamp-2">{post.excerpt}</p>
             </CardContent>
           </CardHeader>
         </Card>
