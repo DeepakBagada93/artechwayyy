@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface RelatedPostsProps {
   currentPostSlug: string;
+  category: string;
 }
 
 interface RelatedPost {
@@ -17,11 +18,13 @@ interface RelatedPost {
     slug: string;
 }
 
-async function getRelatedPosts(currentPostSlug: string): Promise<RelatedPost[]> {
-  if (!supabase) return [];
+async function getRelatedPosts(currentPostSlug: string, category: string): Promise<RelatedPost[]> {
+  if (!supabase || !category) return [];
+  
   const { data, error } = await supabase
     .from('posts')
     .select('title, slug')
+    .eq('category', category)
     .not('slug', 'eq', currentPostSlug)
     .limit(3);
 
@@ -34,21 +37,21 @@ async function getRelatedPosts(currentPostSlug: string): Promise<RelatedPost[]> 
 }
 
 
-export function RelatedPosts({ currentPostSlug }: RelatedPostsProps) {
+export function RelatedPosts({ currentPostSlug, category }: RelatedPostsProps) {
   const [related, setRelated] = useState<RelatedPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchRelated() {
         setIsLoading(true);
-        const posts = await getRelatedPosts(currentPostSlug);
+        const posts = await getRelatedPosts(currentPostSlug, category);
         setRelated(posts);
         setIsLoading(false);
     }
-    if (currentPostSlug) {
+    if (currentPostSlug && category) {
         fetchRelated();
     }
-  }, [currentPostSlug]);
+  }, [currentPostSlug, category]);
 
   if (isLoading) {
     return (

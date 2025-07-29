@@ -126,6 +126,7 @@ export default function BlogPostPage() {
       <aside className="space-y-8">
           <RelatedPosts 
             currentPostSlug={post.slug}
+            category={post.category}
           />
       </aside>
     </article>
