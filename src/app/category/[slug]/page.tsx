@@ -30,9 +30,9 @@ async function getPostsByCategory(categorySlug: string): Promise<Post[]> {
 }
 
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
-  const posts = await getPostsByCategory(params.slug);
-  const categoryName = params.slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+export default async function CategoryPage({ params: { slug } }: CategoryPageProps) {
+  const posts = await getPostsByCategory(slug);
+  const categoryName = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
 
   if (!posts || posts.length === 0) {
@@ -72,4 +72,3 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     </div>
   );
 }
-
