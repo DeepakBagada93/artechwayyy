@@ -36,7 +36,10 @@ export default function Home() {
   const trendingPosts = allPosts.length > 1 ? allPosts.slice(1, 4) : [];
   const otherPosts = allPosts.length > 4 ? allPosts.slice(4) : [];
   
-  const postsByCategory = otherPosts.reduce((acc, post) => {
+  const webDevPosts = otherPosts.filter(p => p.category === 'Web Development');
+  const nonWebDevPosts = otherPosts.filter(p => p.category !== 'Web Development');
+
+  const postsByCategory = nonWebDevPosts.reduce((acc, post) => {
     const category = post.category || 'Uncategorized';
     if (!acc[category]) {
       acc[category] = [];
@@ -45,7 +48,7 @@ export default function Home() {
     return acc;
   }, {} as Record<string, Post[]>);
 
-  const categoryOrder = ['Web Development', 'AI', 'Social Media Marketing', 'Latest Trends'];
+  const categoryOrder = ['AI', 'Social Media Marketing', 'Latest Trends'];
 
   const sortedCategories = Object.keys(postsByCategory).sort((a, b) => {
     const indexA = categoryOrder.indexOf(a);
@@ -109,6 +112,21 @@ export default function Home() {
             </section>
             
             <div className="space-y-16">
+                {webDevPosts.length > 0 && (
+                    <section>
+                        <h2 className="text-3xl font-headline mb-6 border-b-2 border-primary pb-2">
+                            Web Development
+                        </h2>
+                        <div className="flex overflow-x-auto space-x-8 pb-4 -mx-4 px-4">
+                            {webDevPosts.map(post => (
+                                <div key={post.slug} className="min-w-[300px] w-[300px] flex-shrink-0">
+                                    <BlogPostCard post={post} />
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
+
               {sortedCategories.map(category => (
                 postsByCategory[category] && postsByCategory[category].length > 0 && (
                     <section key={category}>
