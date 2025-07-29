@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'Artechway',
-  description: 'The intersection of art, technology, and the future.',
+  description: 'Dive deep into the latest tech trends with Artechway. Our blog offers expert analysis on AI, web development, social media marketing, and the future of digital innovation.',
   icons: {
     icon: '/artechway.png',
     apple: '/artechway.png',
