@@ -32,14 +32,15 @@ export default function Home() {
     fetchPosts();
   }, []);
 
-  const featuredPost = allPosts.length > 0 ? allPosts[0] : null;
-  const trendingPosts = allPosts.length > 1 ? allPosts.slice(1, 4) : [];
+  const featuredPost = allPosts[0];
+  const trendingPosts = allPosts.slice(1, 4);
   const otherPosts = allPosts.slice(4);
   
   const webDevPosts = otherPosts.filter(p => p.category === 'Web Development');
-  const nonWebDevPosts = otherPosts.filter(p => p.category !== 'Web Development');
+  const aiPosts = otherPosts.filter(p => p.category === 'AI');
+  const remainingPosts = otherPosts.filter(p => p.category !== 'Web Development' && p.category !== 'AI');
 
-  const postsByCategory = nonWebDevPosts.reduce((acc, post) => {
+  const postsByCategory = remainingPosts.reduce((acc, post) => {
     const category = post.category || 'Uncategorized';
     if (!acc[category]) {
       acc[category] = [];
@@ -47,8 +48,8 @@ export default function Home() {
     acc[category].push(post);
     return acc;
   }, {} as Record<string, Post[]>);
-
-  const categoryOrder = ['AI', 'Social Media Marketing', 'Latest Trends'];
+  
+  const categoryOrder = ['Social Media Marketing', 'Latest Trends'];
 
   const sortedCategories = Object.keys(postsByCategory).sort((a, b) => {
     const indexA = categoryOrder.indexOf(a);
@@ -126,6 +127,20 @@ export default function Home() {
                         </div>
                     </section>
                 )}
+                
+                {aiPosts.length > 0 && (
+                    <section>
+                        <h2 className="text-3xl font-headline mb-6 border-b-2 border-primary pb-2">
+                            Artificial Intelligence
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {aiPosts.map(post => (
+                                <BlogPostCard key={post.slug} post={post} />
+                            ))}
+                        </div>
+                    </section>
+                )}
+
 
               {sortedCategories.map(category => (
                 postsByCategory[category] && postsByCategory[category].length > 0 && (
