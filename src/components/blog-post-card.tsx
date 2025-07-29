@@ -74,7 +74,7 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
   if (variant === 'compact') {
     return (
       <Link href={`/blog/${post.slug}`} className="group block">
-        <Card className="flex items-center overflow-hidden transition-all duration-300 hover:bg-secondary/50 border-0 border-b rounded-none last:border-b-0 py-4">
+        <Card className="flex items-start overflow-hidden transition-all duration-300 hover:bg-secondary/50 border-0 border-b rounded-none last:border-b-0 py-4">
           <div className="flex-grow">
             <CardTitle className="font-headline text-base leading-tight group-hover:text-primary transition-colors">
               {post.title}

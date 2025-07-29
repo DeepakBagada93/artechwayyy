@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { Post } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
@@ -22,7 +21,6 @@ async function getPosts(): Promise<Post[]> {
 export default function Home() {
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -34,20 +32,25 @@ export default function Home() {
     fetchPosts();
   }, []);
 
-  const searchTerm = searchParams.get('search') || '';
-  const selectedTag = searchParams.get('tag') || 'all';
+  const postsByCategory = allPosts.reduce((acc, post) => {
+    const category = post.category || 'Uncategorized';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(post);
+    return acc;
+  }, {} as Record<string, Post[]>);
 
-  const filteredPosts = allPosts.filter(post => {
-    const tagMatch = selectedTag === 'all' || post.tags.includes(selectedTag);
-    const searchMatch = !searchTerm ||
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-    return tagMatch && searchMatch;
+  const categoryOrder = ['Web Development', 'AI', 'Social Media Marketing', 'Latest Trends'];
+
+  const sortedCategories = Object.keys(postsByCategory).sort((a, b) => {
+    const indexA = categoryOrder.indexOf(a);
+    const indexB = categoryOrder.indexOf(b);
+    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
   });
-
-  const mainStory = filteredPosts[0];
-  const topStories = filteredPosts.slice(1, 5);
-  const otherStories = filteredPosts.slice(5);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -64,55 +67,34 @@ export default function Home() {
       </section>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-4">
-                <Skeleton className="h-[480px] w-full" />
-            </div>
-            <div className="lg:col-span-1 space-y-4">
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-24 w-full" />
-            </div>
+        <div className="space-y-12">
+            {[...Array(3)].map((_, i) => (
+                 <div key={i} className="space-y-4">
+                    <Skeleton className="h-10 w-1/4" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <Skeleton className="h-96 w-full" />
+                        <Skeleton className="h-96 w-full" />
+                        <Skeleton className="h-96 w-full" />
+                    </div>
+                </div>
+            ))}
         </div>
       ) : (
-        <>
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {mainStory && (
-              <div className="lg:col-span-2">
-                <h2 className="text-3xl font-headline mb-4 border-b-2 border-primary pb-2">
-                  Top Story
-                </h2>
-                <BlogPostCard post={mainStory} variant="featured" />
-              </div>
-            )}
-            
-            {topStories.length > 0 && (
-                <div className="lg:col-span-1 space-y-4">
-                  <h2 className="text-3xl font-headline mb-4 border-b-2 border-primary pb-2">
-                    Trending
-                  </h2>
-                  {topStories.map((post) => (
-                    <BlogPostCard key={post.slug} post={post} variant="compact" />
-                  ))}
-                </div>
-            )}
-          </section>
-
-          {otherStories.length > 0 && (
-            <section className="mt-12">
-                <h2 className="text-3xl font-headline mb-4 border-b-2 border-primary pb-2">
-                More News
+        <div className="space-y-16">
+          {allPosts.length > 0 ? (
+            sortedCategories.map(category => (
+              <section key={category}>
+                <h2 className="text-3xl font-headline mb-6 border-b-2 border-primary pb-2">
+                  {category}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {otherStories.map((post) => (
+                  {postsByCategory[category].map(post => (
                     <BlogPostCard key={post.slug} post={post} />
-                ))}
+                  ))}
                 </div>
-            </section>
-          )}
-
-          {allPosts.length === 0 && !isLoading && (
+              </section>
+            ))
+          ) : (
              <div className="text-center py-16">
                 <h2 className="text-2xl font-headline">No posts found</h2>
                 <p className="text-muted-foreground mt-2">
@@ -120,7 +102,7 @@ export default function Home() {
                 </p>
               </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
