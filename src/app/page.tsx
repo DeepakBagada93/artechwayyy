@@ -34,7 +34,7 @@ export default function Home() {
 
   const featuredPost = allPosts.length > 0 ? allPosts[0] : null;
   const trendingPosts = allPosts.length > 1 ? allPosts.slice(1, 4) : [];
-  const otherPosts = allPosts.length > 4 ? allPosts.slice(4) : [];
+  const otherPosts = allPosts.slice(4);
   
   const webDevPosts = otherPosts.filter(p => p.category === 'Web Development');
   const nonWebDevPosts = otherPosts.filter(p => p.category !== 'Web Development');
