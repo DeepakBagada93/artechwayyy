@@ -42,8 +42,8 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
   if (variant === 'featured') {
     return (
       <Link href={`/blog/${post.slug}`} className="group block">
-        <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:border-primary">
-          <CardHeader className="p-0">
+        <Card className="relative h-full flex flex-col overflow-hidden transition-all duration-300 hover:border-primary">
+          <CardHeader className="p-0 relative">
             <div className="relative h-96 w-full overflow-hidden">
               <Image
                 src={post.image}
@@ -56,16 +56,16 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
               />
                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
             </div>
+            <CardContent className="p-6 absolute bottom-0">
+               <div className="mb-2 flex flex-wrap gap-2">
+                  <CategoryBadge />
+              </div>
+              <CardTitle className="font-headline text-3xl text-white leading-tight mb-2 group-hover:text-primary transition-colors break-words">
+                {post.title}
+              </CardTitle>
+              <p className="text-slate-300 text-sm max-w-prose">{post.excerpt}</p>
+            </CardContent>
           </CardHeader>
-          <CardContent className="p-6 absolute bottom-0">
-             <div className="mb-2 flex flex-wrap gap-2">
-                <CategoryBadge />
-            </div>
-            <CardTitle className="font-headline text-3xl text-white leading-tight mb-2 group-hover:text-primary transition-colors break-words">
-              {post.title}
-            </CardTitle>
-            <p className="text-slate-300 text-sm max-w-prose">{post.excerpt}</p>
-          </CardContent>
         </Card>
       </Link>
     );
