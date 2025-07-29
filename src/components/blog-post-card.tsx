@@ -61,7 +61,7 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
              <div className="mb-2 flex flex-wrap gap-2">
                 <CategoryBadge />
             </div>
-            <CardTitle className="font-headline text-3xl text-white leading-tight mb-2 group-hover:text-primary transition-colors">
+            <CardTitle className="font-headline text-3xl text-white leading-tight mb-2 group-hover:text-primary transition-colors break-words">
               {post.title}
             </CardTitle>
             <p className="text-slate-300 text-sm max-w-prose">{post.excerpt}</p>
