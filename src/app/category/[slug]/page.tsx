@@ -12,13 +12,15 @@ interface CategoryPageProps {
 async function getPostsByCategory(categorySlug: string): Promise<Post[]> {
   if (!supabase) return [];
   
-  // Convert slug back to title case for matching
+  // Convert slug back to a readable format for display, but use a case-insensitive query.
   const categoryName = categorySlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  const searchPattern = categoryName.replace(/ /g, '%');
+
 
   const { data, error } = await supabase
     .from('posts')
     .select('*')
-    .eq('category', categoryName)
+    .ilike('category', searchPattern) // Use case-insensitive search
     .order('date', { ascending: false });
 
   if (error) {
