@@ -56,7 +56,7 @@ export function Header() {
     <header className="px-4 md:px-6 sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-            <Image src="/artechway.png" alt="Artechway Logo" width={150} height={80} />
+            <Image src="/artechway.png" alt="Artechway Logo" width={100} height={80} />
         </Link>
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
