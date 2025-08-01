@@ -3,12 +3,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Github, Linkedin, Twitter } from 'lucide-react';
+import { Github, Linkedin, Rss, Twitter } from 'lucide-react';
 
 const generateSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
@@ -63,14 +62,9 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
                     {/* Section 1: Branding & Social */}
                     <div className="md:col-span-4 flex flex-col items-start">
-                        <Link href="/" className="mb-4">
-                            <Image
-                                src="/artechway.png"
-                                alt="Artechway Logo"
-                                width={120}
-                                height={24}
-                                data-ai-hint="logo tech"
-                            />
+                         <Link href="/" className="mb-4 flex items-center gap-2">
+                            <Rss className="h-8 w-8 text-primary" />
+                            <span className="text-2xl font-bold font-headline">Artechway</span>
                         </Link>
                         <p className="text-muted-foreground text-sm mb-4 max-w-xs">
                             Dive deep into the latest tech trends with Artechway. Expert analysis on AI, web development, and more.
