@@ -206,109 +206,113 @@ export default function ManagePostsPage() {
                 </div>
                 <Card>
                     <CardHeader>
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                             <CardTitle>All Blog Posts</CardTitle>
-                            <Button asChild>
-                                <Link href="/admin">
-                                    <PlusSquare className="mr-2 h-4 w-4" />
-                                    Create New Post
-                                </Link>
-                            </Button>
-                        </div>
-                         <div className="flex items-center gap-4 mt-4">
-                            <Input
-                                placeholder="Search by title..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="max-w-sm"
-                            />
-                            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Filter by category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Categories</SelectItem>
-                                    {categories.map(cat => (
-                                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                             <div className="flex flex-col sm:flex-row items-center gap-4">
+                                <Input
+                                    placeholder="Search by title..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full sm:w-auto sm:max-w-xs"
+                                />
+                                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                                    <SelectTrigger className="w-full sm:w-[180px]">
+                                        <SelectValue placeholder="Filter by category" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Categories</SelectItem>
+                                        {categories.map(cat => (
+                                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                 <Button asChild className="w-full sm:w-auto">
+                                    <Link href="/admin">
+                                        <PlusSquare className="mr-2 h-4 w-4" />
+                                        Create New Post
+                                    </Link>
+                                </Button>
+                            </div>
                         </div>
                     </CardHeader>
                     <CardContent>
-                    <Table>
-                        <TableHeader>
-                        <TableRow>
-                            <TableHead>Title</TableHead>
-                            <TableHead className="hidden md:table-cell">Category</TableHead>
-                            <TableHead className="hidden md:table-cell">Author</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                         {isLoading ? (
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center">
-                                    Loading posts...
-                                </TableCell>
+                                <TableHead>Title</TableHead>
+                                <TableHead className="hidden md:table-cell">Category</TableHead>
+                                <TableHead className="hidden md:table-cell">Author</TableHead>
+                                <TableHead>Date</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
-                        ) : paginatedPosts.length > 0 ? (
-                            paginatedPosts.map((post) => (
-                                <TableRow key={post.slug}>
-                                <TableCell className="font-medium max-w-[250px] truncate">{post.title}</TableCell>
-                                <TableCell className="hidden md:table-cell">{post.category}</TableCell>
-                                <TableCell className="hidden md:table-cell">{post.author}</TableCell>
-                                <TableCell>{new Date(post.date).toLocaleDateString()}</TableCell>
-                                <TableCell className="text-right">
-                                    <Button asChild variant="ghost" size="icon">
-                                    <Link href={`/admin/edit/${post.slug}`}>
-                                        <FilePenLine className="h-4 w-4" />
-                                        <span className="sr-only">Edit</span>
-                                    </Link>
-                                    </Button>
-                                    <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => setPostToDelete(post)}
-                                        >
-                                        <Trash2 className="h-4 w-4 text-destructive" />
-                                        <span className="sr-only">Delete</span>
-                                        </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This action cannot be undone. This will permanently
-                                            delete the post titled &quot;{post.title}&quot;.
-                                        </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                        <AlertDialogCancel onClick={() => setPostToDelete(null)}>
-                                            Cancel
-                                        </AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleDelete}>
-                                            Delete
-                                        </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                    </AlertDialog>
-                                </TableCell>
+                            </TableHeader>
+                            <TableBody>
+                            {isLoading ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="h-24 text-center">
+                                        Loading posts...
+                                    </TableCell>
                                 </TableRow>
-                            ))
-                        ) : (
-                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center">
-                                    No posts found.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                        </TableBody>
-                    </Table>
-                     <div className="flex items-center justify-end space-x-2 py-4">
+                            ) : paginatedPosts.length > 0 ? (
+                                paginatedPosts.map((post) => (
+                                    <TableRow key={post.slug}>
+                                    <TableCell className="font-medium max-w-[200px] sm:max-w-[250px] truncate">{post.title}</TableCell>
+                                    <TableCell className="hidden md:table-cell">{post.category}</TableCell>
+                                    <TableCell className="hidden md:table-cell">{post.author}</TableCell>
+                                    <TableCell>{new Date(post.date).toLocaleDateString()}</TableCell>
+                                    <TableCell className="text-right">
+                                        <div className="flex justify-end items-center gap-2">
+                                        <Button asChild variant="ghost" size="icon">
+                                        <Link href={`/admin/edit/${post.slug}`}>
+                                            <FilePenLine className="h-4 w-4" />
+                                            <span className="sr-only">Edit</span>
+                                        </Link>
+                                        </Button>
+                                        <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => setPostToDelete(post)}
+                                            >
+                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                            <span className="sr-only">Delete</span>
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This action cannot be undone. This will permanently
+                                                delete the post titled &quot;{post.title}&quot;.
+                                            </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                            <AlertDialogCancel onClick={() => setPostToDelete(null)}>
+                                                Cancel
+                                            </AlertDialogCancel>
+                                            <AlertDialogAction onClick={handleDelete}>
+                                                Delete
+                                            </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                        </AlertDialog>
+                                        </div>
+                                    </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="h-24 text-center">
+                                        No posts found.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                     <div className="flex items-center justify-center sm:justify-end space-x-2 py-4">
                         <Button
                             variant="outline"
                             size="sm"
@@ -337,3 +341,5 @@ export default function ManagePostsPage() {
     </div>
   );
 }
+
+    
