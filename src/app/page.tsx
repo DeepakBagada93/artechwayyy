@@ -60,13 +60,10 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8">
       <section className="text-center my-12 md:my-16">
         <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-white">
-          The Intersection of Art,
-          <br />
-          and the <Typewriter words={['Technology', 'Future']} />
+          <Typewriter words={['Code', 'Create', 'Market', 'Automate']} />
         </h1>
         <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-          Your daily brief on Web Development, AI, and Social Media Marketing.
-          Stay ahead of the curve with expert insights and analysis.
+          Stay Ahead with Artechway. Your daily brief on Web Development, AI, and Social Media Marketing.
         </p>
       </section>
 
