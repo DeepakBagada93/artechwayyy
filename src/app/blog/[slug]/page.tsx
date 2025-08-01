@@ -10,26 +10,14 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, User } from 'lucide-react';
 import { RelatedPosts } from '@/components/related-posts';
 import { Separator } from '@/components/ui/separator';
-import parse, { domToReact } from 'html-react-parser';
+import parse, { domToReact, HTMLReactParserOptions } from 'html-react-parser';
 import DOMPurify from 'dompurify';
-
-// Basic markdown to HTML conversion
-function markdownToHtml(markdown: string) {
-    if (!markdown) return '';
-    // Links
-    let html = markdown.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-    // Basic bold
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Basic italic
-    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    // Newlines
-    html = html.replace(/\n/g, '<br />');
-    return html;
-}
+import { marked } from 'marked';
 
 export default function BlogPostPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sanitizedContent, setSanitizedContent] = useState('');
   const params = useParams();
   const slug = params.slug as string;
 
@@ -60,6 +48,17 @@ export default function BlogPostPage() {
     }
   }, [slug]);
 
+  useEffect(() => {
+    if (post?.content && typeof window !== 'undefined') {
+        const unsafeHtml = marked.parse(post.content) as string;
+        const safeHtml = DOMPurify.sanitize(unsafeHtml, {
+            USE_PROFILES: { html: true },
+            ADD_ATTR: ['target', 'rel'],
+        });
+        setSanitizedContent(safeHtml);
+    }
+  }, [post]);
+
   if (isLoading) {
     return <div className="container mx-auto max-w-4xl px-4 py-12 text-center">Loading post...</div>;
   }
@@ -67,15 +66,14 @@ export default function BlogPostPage() {
   if (!post) {
     notFound();
   }
-
-  const convertedHtml = markdownToHtml(post.content);
-  // Sanitize the HTML content on the client side
-  const sanitizedContent = typeof window !== 'undefined' ? DOMPurify.sanitize(convertedHtml) : convertedHtml;
   
-  const options = {
+  const options: HTMLReactParserOptions = {
     replace: (domNode: any) => {
-      if (domNode.name === 'a') {
-        return <a href={domNode.attribs.href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">{domToReact(domNode.children)}</a>;
+      if (domNode.name === 'a' && domNode.attribs.href) {
+        return <a href={domNode.attribs.href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">{domToReact(domNode.children, options)}</a>;
+      }
+      if (domNode.name === 'p') {
+         return <p className="mb-4">{domToReact(domNode.children, options)}</p>;
       }
     }
   };
