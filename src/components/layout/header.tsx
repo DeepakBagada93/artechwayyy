@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, Rss } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import {
@@ -56,8 +56,7 @@ export function Header() {
     <header className="px-4 md:px-6 sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-            <Rss className="h-7 w-7 text-primary" />
-            <span className="text-xl font-bold font-headline">Artechway</span>
+            <Image src="/artechway.png" alt="Artechway Logo" width={140} height={40} />
         </Link>
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
@@ -81,8 +80,7 @@ export function Header() {
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <SheetHeader className="p-4 border-b">
                  <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Rss className="h-7 w-7 text-primary" />
-                    <span className="text-xl font-bold font-headline">Artechway</span>
+                    <Image src="/artechway.png" alt="Artechway Logo" width={140} height={40} />
                  </Link>
               </SheetHeader>
               <div className="p-4">
