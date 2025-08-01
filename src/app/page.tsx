@@ -6,7 +6,6 @@ import { Post } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Typewriter } from '@/components/typewriter';
 
 async function getPosts(): Promise<Post[]> {
   if (!supabase) return [];
@@ -60,10 +59,12 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8">
       <section className="text-center my-12 md:my-16">
         <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-white">
-          <Typewriter words={['Code', 'Create', 'Market', 'Automate']} />
+          Code. Create. Market. Automate.
+          <br />
+          <span className="text-primary">Stay Ahead with Artechway.</span>
         </h1>
         <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-          Stay Ahead with Artechway. Your daily brief on Web Development, AI, and Social Media Marketing.
+          Your daily brief on Web Development, AI, and Social Media Marketing.
         </p>
       </section>
 
