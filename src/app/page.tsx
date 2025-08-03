@@ -30,8 +30,10 @@ function HomePageLoader() {
             <div className="text-center space-y-8">
                  <Image src="/artechway.png" alt="Artechway Logo" width={200} height={100} className="mx-auto" />
                  <div className="h-14 flex items-center justify-center">
-                    <h2 className="text-2xl md:text-3xl font-headline text-white">
-                        Loading the latest in tech for you.
+                    <h2 className="text-2xl md:text-3xl font-headline text-white px-4">
+                        Where innovation meets inspiration.
+                        <br />
+                        <span className="text-muted-foreground">Your daily tech brief is loading...</span>
                     </h2>
                 </div>
                 <Progress value={progress} className="w-64 mx-auto" />
