@@ -2,10 +2,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Post } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
 import { Progress } from '@/components/ui/progress';
+import { useLayout } from '@/app/layout';
 
 async function getPosts(): Promise<Post[]> {
   if (!supabase) return [];
@@ -34,8 +36,9 @@ function HomePageLoader() {
     }, []);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-20rem)]">
-            <div className="text-center space-y-4">
+        <div className="flex flex-col items-center justify-center min-h-screen fixed inset-0 bg-background z-50">
+            <div className="text-center space-y-6">
+                 <Image src="/artechway.png" alt="Artechway Logo" width={200} height={100} className="mx-auto" />
                 <h2 className="text-2xl font-headline text-primary">
                     Brewing fresh content for you...
                 </h2>
@@ -50,6 +53,12 @@ function HomePageLoader() {
 export default function Home() {
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { setIsHeaderVisible, setIsFooterVisible } = useLayout();
+
+  useEffect(() => {
+    setIsHeaderVisible(!isLoading);
+    setIsFooterVisible(!isLoading);
+  }, [isLoading, setIsHeaderVisible, setIsFooterVisible]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -57,7 +66,7 @@ export default function Home() {
       const posts = await getPosts();
       setAllPosts(posts);
       // Add a small delay to prevent flash of content
-      setTimeout(() => setIsLoading(false), 500);
+      setTimeout(() => setIsLoading(false), 1500);
     };
     fetchPosts();
   }, []);
@@ -86,11 +95,12 @@ export default function Home() {
     return indexA - indexB;
   });
 
+  if (isLoading) {
+    return <HomePageLoader />;
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
-      {isLoading ? (
-          <HomePageLoader />
-      ) : (
         <>
           <section className="text-center my-12 md:my-16">
             <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-white">
@@ -154,7 +164,6 @@ export default function Home() {
               </div>
           )}
         </>
-      )}
     </div>
   );
 }
