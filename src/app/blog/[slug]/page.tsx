@@ -13,6 +13,36 @@ import { Separator } from '@/components/ui/separator';
 import parse, { domToReact, HTMLReactParserOptions } from 'html-react-parser';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
+import { ReadingProgressBar } from '@/components/reading-progress-bar';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function PostSkeleton() {
+    return (
+      <div className="container mx-auto max-w-4xl px-4 py-12">
+        <div className="mb-8">
+            <Skeleton className="h-72 md:h-96 w-full rounded-lg mb-8" />
+            <div className="flex gap-2 mb-4">
+                <Skeleton className="h-6 w-24 rounded-full" />
+                <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+            <Skeleton className="h-12 w-3/4 mb-4" />
+            <div className="flex items-center gap-6">
+                <Skeleton className="h-6 w-28" />
+                <Skeleton className="h-6 w-32" />
+            </div>
+        </div>
+        <div className="space-y-6">
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-11/12" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-10/12" />
+        </div>
+      </div>
+    );
+}
+
 
 export default function BlogPostPage() {
   const [post, setPost] = useState<Post | null>(null);
@@ -60,7 +90,7 @@ export default function BlogPostPage() {
   }, [post]);
 
   if (isLoading) {
-    return <div className="container mx-auto max-w-4xl px-4 py-12 text-center">Loading post...</div>;
+    return <PostSkeleton />;
   }
   
   if (!post) {
@@ -79,6 +109,8 @@ export default function BlogPostPage() {
   };
 
   return (
+    <>
+    <ReadingProgressBar />
     <article className="container mx-auto max-w-4xl px-4 py-12">
       <header className="mb-8">
         <div className="relative h-72 md:h-96 w-full overflow-hidden rounded-lg mb-8 shadow-2xl shadow-black/30">
@@ -128,5 +160,6 @@ export default function BlogPostPage() {
           />
       </aside>
     </article>
+    </>
   );
 }
