@@ -9,6 +9,24 @@ import { BlogPostCard } from '@/components/blog-post-card';
 import { useLayout } from '@/app/layout';
 
 function HomePageLoader() {
+    const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+      const timer = setInterval(() => {
+        setProgress(prevProgress => {
+          if (prevProgress >= 100) {
+            clearInterval(timer);
+            return 100;
+          }
+          return prevProgress + 1;
+        });
+      }, 20);
+
+      return () => {
+        clearInterval(timer);
+      };
+    }, []);
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen fixed inset-0 bg-background z-50">
             <div className="text-center space-y-8">
@@ -19,7 +37,13 @@ function HomePageLoader() {
                     <span className="text-muted-foreground">Your daily tech brief is loading...</span>
                 </h2>
                 <div className="flex justify-center items-center pt-4">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                    <div
+                      className="relative flex items-center justify-center h-24 w-24 rounded-full"
+                      style={{ background: `conic-gradient(hsl(var(--primary)) ${progress * 3.6}deg, hsl(var(--muted)) 0deg)` }}
+                    >
+                      <div className="absolute h-[5.5rem] w-[5.5rem] bg-background rounded-full"></div>
+                      <span className="z-10 text-xl font-bold text-white">{progress}%</span>
+                    </div>
                 </div>
             </div>
         </div>
