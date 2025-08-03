@@ -42,7 +42,9 @@ function HomePageLoader() {
                       style={{ background: `conic-gradient(hsl(var(--primary)) ${progress * 3.6}deg, hsl(var(--muted)) 0deg)` }}
                     >
                       <div className="absolute h-[5.5rem] w-[5.5rem] bg-background rounded-full"></div>
-                      <span className="z-10 text-xl font-bold text-white">{progress}%</span>
+                      <span className="z-10 text-xl font-bold text-white">
+                        {progress === 100 ? 'Go' : `${progress}%`}
+                      </span>
                     </div>
                 </div>
             </div>
