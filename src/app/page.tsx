@@ -8,14 +8,6 @@ import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
 import { Progress } from '@/components/ui/progress';
 import { useLayout } from '@/app/layout';
-import { Typewriter } from '@/components/typewriter';
-
-const loadingTexts = [
-  "Compiling the future of web development...",
-  "Training AI models to write for you...",
-  "Optimizing your social media strategy...",
-  "Decoding the latest tech trends..."
-];
 
 function HomePageLoader() {
     const [progress, setProgress] = useState(0);
@@ -37,13 +29,12 @@ function HomePageLoader() {
         <div className="flex flex-col items-center justify-center min-h-screen fixed inset-0 bg-background z-50">
             <div className="text-center space-y-8">
                  <Image src="/artechway.png" alt="Artechway Logo" width={200} height={100} className="mx-auto" />
-                 <div className="h-14">
+                 <div className="h-14 flex items-center justify-center">
                     <h2 className="text-2xl md:text-3xl font-headline text-white">
-                        <Typewriter words={loadingTexts} />
+                        Loading the latest in tech for you.
                     </h2>
                 </div>
                 <Progress value={progress} className="w-64 mx-auto" />
-                <p className="text-sm text-muted-foreground">Loading the latest in tech for you.</p>
             </div>
         </div>
     );
@@ -63,8 +54,19 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       setIsLoading(true);
-      const posts = await getPosts();
-      setAllPosts(posts);
+      if (!supabase) {
+        // Handle case where supabase is not initialized
+        setTimeout(() => setIsLoading(false), 2500); // Still show loader for a bit
+        return;
+      }
+      const { data, error } = await supabase.from('posts').select('*').order('date', { ascending: false });
+
+      if (error) {
+          console.error('Error fetching posts:', error);
+          setAllPosts([]);
+      } else {
+          setAllPosts(data as Post[]);
+      }
       // Add a small delay to prevent flash of content
       setTimeout(() => setIsLoading(false), 2500);
     };
