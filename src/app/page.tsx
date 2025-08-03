@@ -6,7 +6,6 @@ import { Post } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
 import { Progress } from '@/components/ui/progress';
-import { Typewriter } from '@/components/typewriter';
 
 async function getPosts(): Promise<Post[]> {
   if (!supabase) return [];
@@ -34,19 +33,11 @@ function HomePageLoader() {
         return () => clearInterval(timer);
     }, []);
 
-    const loadingTexts = [
-      "Brewing fresh content...",
-      "Polishing pixels...",
-      "Warming up the servers...",
-      "Gathering the best stories...",
-      "Almost there...",
-    ];
-
     return (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-20rem)]">
             <div className="text-center space-y-4">
-                <h2 className="text-2xl font-headline text-white">
-                    <Typewriter words={loadingTexts} />
+                <h2 className="text-2xl font-headline text-primary">
+                    Brewing fresh content for you...
                 </h2>
                 <Progress value={progress} className="w-64 mx-auto" />
                 <p className="text-sm text-muted-foreground">Loading the latest in tech for you.</p>
