@@ -34,7 +34,7 @@ export function Header() {
         return;
       }
       
-      processCategories(data.map(p => p.category));
+ processCategories(data.map(p => p.category as string | null));
     }
 
     function processCategories(categories: (string | null)[]) {

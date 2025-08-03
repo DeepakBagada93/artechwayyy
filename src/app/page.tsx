@@ -8,16 +8,14 @@ import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
 import { Progress } from '@/components/ui/progress';
 import { useLayout } from '@/app/layout';
+import { Typewriter } from '@/components/typewriter';
 
-async function getPosts(): Promise<Post[]> {
-  if (!supabase) return [];
-  const { data, error } = await supabase.from('posts').select('*').order('date', { ascending: false });
-  if (error) {
-    console.error('Error fetching posts:', error);
-    return [];
-  }
-  return data as Post[];
-}
+const loadingTexts = [
+  "Compiling the future of web development...",
+  "Training AI models to write for you...",
+  "Optimizing your social media strategy...",
+  "Decoding the latest tech trends..."
+];
 
 function HomePageLoader() {
     const [progress, setProgress] = useState(0);
@@ -37,11 +35,13 @@ function HomePageLoader() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen fixed inset-0 bg-background z-50">
-            <div className="text-center space-y-6">
+            <div className="text-center space-y-8">
                  <Image src="/artechway.png" alt="Artechway Logo" width={200} height={100} className="mx-auto" />
-                <h2 className="text-2xl font-headline text-primary">
-                    Brewing fresh content for you...
-                </h2>
+                 <div className="h-14">
+                    <h2 className="text-2xl md:text-3xl font-headline text-white">
+                        <Typewriter words={loadingTexts} />
+                    </h2>
+                </div>
                 <Progress value={progress} className="w-64 mx-auto" />
                 <p className="text-sm text-muted-foreground">Loading the latest in tech for you.</p>
             </div>
@@ -66,7 +66,7 @@ export default function Home() {
       const posts = await getPosts();
       setAllPosts(posts);
       // Add a small delay to prevent flash of content
-      setTimeout(() => setIsLoading(false), 1500);
+      setTimeout(() => setIsLoading(false), 2500);
     };
     fetchPosts();
   }, []);
