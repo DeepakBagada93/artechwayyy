@@ -12,13 +12,14 @@ function HomePageLoader() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen fixed inset-0 bg-background z-50">
             <div className="text-center space-y-8">
-                 <Image src="/artechway.png" alt="Artechway Logo" width={200} height={100} className="mx-auto" />
-                 <div className="h-14 flex items-center justify-center">
-                    <h2 className="text-2xl md:text-3xl font-headline text-white px-4">
-                        Where innovation meets inspiration.
-                        <br />
-                        <span className="text-muted-foreground">Your daily tech brief is loading...</span>
-                    </h2>
+                 <Image src="/artechway.png" alt="Artechway Logo" width={200} height={100} className="mx-auto mb-8" />
+                 <h2 className="text-2xl md:text-3xl font-headline text-white px-4">
+                    Where innovation meets inspiration.
+                    <br />
+                    <span className="text-muted-foreground">Your daily tech brief is loading...</span>
+                </h2>
+                <div className="flex justify-center items-center pt-4">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
                 </div>
             </div>
         </div>
