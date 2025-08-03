@@ -17,6 +17,25 @@ async function getPosts(): Promise<Post[]> {
   return data as Post[];
 }
 
+function HomePageSkeleton() {
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-4">
+                 <Skeleton className="h-10 w-1/4 rounded-lg" />
+                 <Skeleton className="h-[480px] w-full rounded-lg" />
+            </div>
+            <div className="lg:col-span-1 space-y-4">
+                 <Skeleton className="h-10 w-1/2 rounded-lg" />
+                 <div className="space-y-4">
+                    <Skeleton className="h-28 w-full rounded-lg" />
+                    <Skeleton className="h-28 w-full rounded-lg" />
+                    <Skeleton className="h-28 w-full rounded-lg" />
+                 </div>
+            </div>
+        </div>
+    )
+}
+
 export default function Home() {
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,18 +88,7 @@ export default function Home() {
       </section>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-4">
-                 <Skeleton className="h-10 w-1/4" />
-                 <Skeleton className="h-[480px] w-full" />
-            </div>
-            <div className="lg:col-span-1 space-y-4">
-                 <Skeleton className="h-10 w-1/2" />
-                 <Skeleton className="h-28 w-full" />
-                 <Skeleton className="h-28 w-full" />
-                 <Skeleton className="h-28 w-full" />
-            </div>
-        </div>
+        <HomePageSkeleton />
       ) : allPosts.length > 0 ? (
         <>
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
