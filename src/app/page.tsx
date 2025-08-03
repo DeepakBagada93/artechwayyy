@@ -6,29 +6,13 @@ import Image from 'next/image';
 import { Post } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
 import { BlogPostCard } from '@/components/blog-post-card';
-import { Progress } from '@/components/ui/progress';
 import { useLayout } from '@/app/layout';
 
 function HomePageLoader() {
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setProgress((prev) => {
-                if (prev >= 95) {
-                    clearInterval(timer);
-                    return 95;
-                }
-                return prev + 5;
-            });
-        }, 100);
-        return () => clearInterval(timer);
-    }, []);
-
     return (
         <div className="flex flex-col items-center justify-center min-h-screen fixed inset-0 bg-background z-50">
             <div className="text-center space-y-8">
-                 <Image src="/artechway.png" alt="Artechway Logo" width={200} height={100} className="mx-auto" />
+                 <Image src="/artechway.png" alt="Artechway Logo" width={200} height={100} className="mx-auto animate-pulse" />
                  <div className="h-14 flex items-center justify-center">
                     <h2 className="text-2xl md:text-3xl font-headline text-white px-4">
                         Where innovation meets inspiration.
@@ -36,7 +20,6 @@ function HomePageLoader() {
                         <span className="text-muted-foreground">Your daily tech brief is loading...</span>
                     </h2>
                 </div>
-                <Progress value={progress} className="w-64 mx-auto" />
             </div>
         </div>
     );
